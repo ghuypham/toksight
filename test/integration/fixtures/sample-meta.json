@@ -1,0 +1,20 @@
+{
+  "session_id": "s1",
+  "project_path": "/tmp/tok-sight-fixture",
+  "start_time": "2026-04-18T09:00:00Z",
+  "duration_minutes": 1,
+  "tool_counts": { "Read": 2, "Edit": 1 },
+  "git_commits": 1,
+  "git_pushes": 0,
+  "input_tokens": 150,
+  "output_tokens": 150,
+  "tool_errors": 0,
+  "tool_error_categories": {},
+  "user_interruptions": 0,
+  "uses_task_agent": false,
+  "uses_mcp": false,
+  "lines_added": 10,
+  "lines_removed": 2,
+  "files_modified": 1,
+  "message_hours": [9]
+}

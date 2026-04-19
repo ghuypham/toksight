@@ -1,0 +1,123 @@
+{
+  "name": "toksight",
+  "displayName": "TokSight",
+  "description": "Real-time Claude Code usage metrics in your VS Code sidebar",
+  "version": "0.1.0",
+  "publisher": "toksight",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/toksight/toksight.git"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "toksight",
+          "title": "TokSight",
+          "icon": "$(pulse)"
+        }
+      ]
+    },
+    "views": {
+      "toksight": [
+        {
+          "type": "webview",
+          "id": "toksight.sidebar",
+          "name": "TokSight"
+        }
+      ],
+      "explorer": [
+        {
+          "type": "webview",
+          "id": "toksight.explorer",
+          "name": "TokSight",
+          "visibility": "collapsed"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "toksight.openDashboard",
+        "title": "TokSight: Open Dashboard"
+      }
+    ],
+    "configuration": {
+      "title": "TokSight",
+      "properties": {
+        "toksight.jsonlPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to Claude Code JSONL directory. Defaults to ~/.claude/projects/"
+        },
+        "toksight.pricingOverrides": {
+          "type": "object",
+          "default": {},
+          "description": "Override model pricing (cost per million tokens). Example: { \"claude-sonnet-4-6\": { \"inputPerMillion\": 3 } }"
+        },
+        "toksight.carouselInterval": {
+          "type": "number",
+          "default": 5000,
+          "description": "Carousel auto-rotation interval in milliseconds"
+        },
+        "toksight.insightsMax": {
+          "type": "number",
+          "default": 3,
+          "description": "Maximum number of insights displayed"
+        },
+        "toksight.primaryUnit": {
+          "type": "string",
+          "enum": [
+            "cost",
+            "tokens"
+          ],
+          "default": "cost",
+          "description": "Primary unit for hero numbers (Today/Week/Session). 'cost' shows $ (API equivalent), 'tokens' shows token counts. Sub-displays always show $."
+        },
+        "toksight.budget5h": {
+          "type": "number",
+          "default": 0,
+          "minimum": 0,
+          "description": "Your 5h window budget ($USD, API-equivalent). When > 0, Spend slide shows % of cap + ETA. Leave 0 to show raw $ only. Anthropic does not publish exact caps — see https://www.anthropic.com/pricing for plan details."
+        },
+        "toksight.oauthEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Anthropic OAuth Usage API calls for weekly/5h limits. Turn off for 100% local mode."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.config.mjs",
+    "watch": "node esbuild.config.mjs --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit",
+    "package": "vsce package",
+    "dump-snapshot": "npx tsx scripts/dump-snapshot.ts && open plans/260417-1352-ui-value-audit-redesign/mockup.html"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^28.0.1",
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.0.0",
+    "esbuild": "^0.21.0",
+    "jsdom": "^29.0.2",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  },
+  "dependencies": {
+    "preact": "^10.22.0"
+  }
+}

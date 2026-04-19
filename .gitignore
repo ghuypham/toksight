@@ -1,0 +1,8 @@
+node_modules/
+dist/
+*.vsix
+.DS_Store
+plans/260417-1352-ui-value-audit-redesign/snapshot.json
+plans/260417-1352-ui-value-audit-redesign/snapshot.js
+.gitnexus
+.superpowers/
