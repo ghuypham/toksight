@@ -1,4 +1,4 @@
-import { useExtensionData } from './hooks/use-extension-data';
+import { useExtensionData, sendToExtension } from './hooks/use-extension-data';
 import { theme } from './styles/theme';
 import { Header } from './components/header';
 import { TodayGrid } from './components/today-grid';
@@ -377,6 +377,30 @@ export function App() {
           <GroupQuota data={data} />
           <GroupModelsTools data={data} />
           <GroupInsights data={data} />
+
+          {/* ── Open Dashboard CTA ── */}
+          <div style={{ padding: '14px 0 6px' }}>
+            <button
+              onClick={() => sendToExtension('openDashboard')}
+              style={{
+                width: '100%',
+                padding: '9px 12px',
+                background: 'var(--tok-accent-primary)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '6px',
+                fontFamily: theme.sans,
+                fontSize: '12px',
+                fontWeight: 500,
+                cursor: 'pointer',
+                letterSpacing: '0.01em',
+                opacity: 0.9,
+              }}
+            >
+              Open full dashboard →
+            </button>
+          </div>
+
           {footnoteBlock}
         </>
       )}

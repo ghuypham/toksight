@@ -1,8 +1,20 @@
 node_modules/
 dist/
 *.vsix
+*.tgz
+*.zip
 .DS_Store
-plans/260417-1352-ui-value-audit-redesign/snapshot.json
-plans/260417-1352-ui-value-audit-redesign/snapshot.js
-.gitnexus
+
+# Internal / private
+.claude/
+.gitnexus/
 .superpowers/
+plans/
+docs/
+release-assets/
+scripts/
+CLAUDE.md
+AGENTS.md
+DESIGN.md
+RELEASE.md
+mockup-data.json

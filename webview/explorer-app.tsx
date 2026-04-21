@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'preact/hooks';
+import { useState, useEffect } from 'preact/hooks';
 import type { ExplorerData } from '../src/types';
 import { theme } from './styles/theme';
 import { getModelColor as modelColor, getModelFamilyName } from './utils/model-utils';
@@ -15,21 +15,22 @@ const ROTATE_MS = 12000;  // slower cadence — users need time to read each sli
 
 /**
  * ExplorerApp — widget carousel per mockup §1:
- *   Slide 1 QUOTA · Slide 2 SESSION NOW · Slide 3 LAST SESSION (recap, optional)
+ *   Slide 1 QUOTA · Slide 2 SESSION NOW · Slide 3 LAST SESSION (recap, only when produced)
  * Header is dynamic: live dot + active model + slide counter (1/N).
- * Smart default: when an active session appears and user hasn't navigated
- * manually, jump to Slide 2 (the actionable "right now" view).
+ * Default slide is always Slide 1 (Quota) — the most important view.
  * Auto-rotates every 12s; paused on hover; respects prefers-reduced-motion.
- * When no latestRecap, slide 3 is hidden — carousel cycles 1 ↔ 2 only.
+ * Slide 3 is only shown when a real recap exists (latestRecap.recap present) —
+ * "recap pending" or "no recent session" states are hidden until Anthropic
+ * produces the narrative; carousel cycles 1 ↔ 2 in that case.
  */
 export function ExplorerApp() {
   const [data, setData] = useState<ExplorerData | null>(null);
   const [slide, setSlide] = useState(0);
   const [paused, setPaused] = useState(false);
-  const userNavigatedRef = useRef(false);  // once user clicks, never auto-jump again
 
-  const hasRecap = !!data?.latestRecap;
-  const visibleSlides = hasRecap ? MAX_SLIDES : 2;  // gate slide 3 behind recap data
+  // Only show slide 3 when Anthropic has produced a real recap narrative.
+  const hasRecap = !!data?.latestRecap?.recap;
+  const visibleSlides = hasRecap ? MAX_SLIDES : 2;
 
   useEffect(() => {
     const handler = (e: MessageEvent) => {
@@ -40,12 +41,6 @@ export function ExplorerApp() {
     return () => window.removeEventListener('message', handler);
   }, []);
 
-  // Smart default — jump to Session slide when an active session is detected
-  useEffect(() => {
-    if (userNavigatedRef.current) return;
-    if (data?.activeSessionDetail && slide === 0) setSlide(1);
-  }, [data?.activeSessionDetail, slide]);
-
   // Snap back if current slide exceeds visible count (e.g. recap data goes away)
   useEffect(() => {
     if (slide >= visibleSlides) setSlide(0);
@@ -53,7 +48,6 @@ export function ExplorerApp() {
 
   const userSetSlide = (i: number) => {
     if (i >= visibleSlides) return;
-    userNavigatedRef.current = true;
     setSlide(i);
   };
 

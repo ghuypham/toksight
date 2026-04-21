@@ -1,6 +1,7 @@
 import { useMemo } from 'preact/hooks';
 import type { WebviewData } from '../../src/types';
 import { buildModelColorMap } from '../utils/model-utils';
+import { useTimeRange } from './time-range-context';
 
 function fmtTokK(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -9,7 +10,10 @@ function fmtTokK(n: number): string {
 }
 
 export function TabModelsTools({ data }: { data: Partial<WebviewData> }) {
-  const modelMix   = data.modelMix   ?? [];
+  const { range } = useTimeRange();
+  const periodLabel = range === 'today' ? 'Today' : range === '7d' ? '7d' : range === '30d' ? '30d' : 'All time';
+
+  const modelMix   = (data.modelMix ?? []).filter(m => m.model !== '<synthetic>');
   const tools      = data.tools      ?? [];
   const mcp        = data.mcp        ?? [];
   const skills     = data.skills     ?? [];
@@ -74,10 +78,10 @@ export function TabModelsTools({ data }: { data: Partial<WebviewData> }) {
         </div>
       )}
 
-      {/* ── Token breakdown · 7d ── */}
+      {/* ── Token breakdown ── */}
       {tb && (
         <div class="fp-section">
-          <h3>Token breakdown · 7d</h3>
+          <h3>Token breakdown · {periodLabel}</h3>
           <div class="token-cells">
             <div class="tc">
               <div class="tc-k">Input</div>
@@ -110,10 +114,10 @@ export function TabModelsTools({ data }: { data: Partial<WebviewData> }) {
         </div>
       )}
 
-      {/* ── Tools table · 7d ── */}
+      {/* ── Tools table ── */}
       {tools.length > 0 && (
         <div class="fp-section">
-          <h3>Tools · 7d</h3>
+          <h3>Tools · {periodLabel}</h3>
           <table class="fp">
             <thead>
               <tr>
@@ -144,17 +148,36 @@ export function TabModelsTools({ data }: { data: Partial<WebviewData> }) {
         </div>
       )}
 
-      {/* ── MCP · Skills · Agents ── three equal-rank extension surfaces.
-         Each column: top-N rows with share bar (% of that column's max calls),
-         total-calls / total-cost footer row. */}
-      {(mcp.length > 0 || skills.length > 0 || agents.length > 0) && (
+      {/* ── MCP Servers ── */}
+      {mcp.length > 0 && (
         <div class="fp-section">
-          <h3>MCP · Skills · Agents</h3>
-          <div class="three-col">
-            <StatsColumn title="MCP servers" items={mcp} emptyLabel="No MCP calls yet" />
-            <StatsColumn title="Skills invoked" items={skills} emptyLabel="No Skill calls yet" />
-            <StatsColumn title="Agents dispatched" items={agents} emptyLabel="No Task agents yet" />
-          </div>
+          <h3>MCP Servers</h3>
+          <p style={{ fontSize: '11px', color: 'var(--tok-text-muted)', margin: '0 0 12px 0', lineHeight: '1.5' }}>
+            External tool servers connected to Claude via Model Context Protocol — file systems, databases, APIs, and custom integrations.
+          </p>
+          <SurfaceTable items={mcp} />
+        </div>
+      )}
+
+      {/* ── Skills ── */}
+      {skills.length > 0 && (
+        <div class="fp-section">
+          <h3>Skills invoked</h3>
+          <p style={{ fontSize: '11px', color: 'var(--tok-text-muted)', margin: '0 0 12px 0', lineHeight: '1.5' }}>
+            Reusable workflow templates (superpowers) triggered by Claude during this session — codified expertise loaded on demand.
+          </p>
+          <SurfaceTable items={skills} />
+        </div>
+      )}
+
+      {/* ── Agents ── */}
+      {agents.length > 0 && (
+        <div class="fp-section">
+          <h3>Agents dispatched</h3>
+          <p style={{ fontSize: '11px', color: 'var(--tok-text-muted)', margin: '0 0 12px 0', lineHeight: '1.5' }}>
+            Sub-agents spawned via the Task tool to handle specialized work in parallel — each runs as an independent Claude context.
+          </p>
+          <SurfaceTable items={agents} />
         </div>
       )}
 
@@ -186,46 +209,60 @@ export function TabModelsTools({ data }: { data: Partial<WebviewData> }) {
   );
 }
 
-/** Entry shape shared by MCP, Skill, Agent — all three surfaces carry the same
- * call/tokens/cost fields so a single column component handles all three. */
 type Stat = { name: string; calls: number; tokens: number; cost: number };
 
-/**
- * Single drill column: top-8 rows with share bar (% of max calls in this column),
- * footer shows column totals. Empty state keeps column width stable so the 3-col
- * grid doesn't reflow when one surface has no data.
- */
-function StatsColumn({ title, items, emptyLabel }: { title: string; items: Stat[]; emptyLabel: string }) {
+/** Full-width table for MCP / Skill / Agent surfaces with per-call cost and share bar. */
+function SurfaceTable({ items }: { items: Stat[] }) {
   const maxCalls = Math.max(...items.map(i => i.calls), 1);
   const totalCalls = items.reduce((s, i) => s + i.calls, 0);
   const totalCost  = items.reduce((s, i) => s + i.cost, 0);
+  const totalTokens = items.reduce((s, i) => s + i.tokens, 0);
   return (
-    <div class="drill-card">
-      <h4>{title}</h4>
-      {items.length === 0 && (
-        <div class="mt-row">
-          <span class="n" style={{ color: 'var(--tok-text-muted)' }}>{emptyLabel}</span>
-        </div>
-      )}
-      {items.slice(0, 8).map(it => (
-        <div key={it.name} class="mt-row" style={{ display: 'grid', gridTemplateColumns: '1fr auto', rowGap: '3px' }}>
-          <span class="n" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{it.name}</span>
-          <span class="s">
-            {it.calls}× {it.cost >= 0.01 ? ` · $${it.cost.toFixed(2)}` : ''}
-          </span>
-          <div style={{ gridColumn: '1 / -1', height: '3px', background: 'var(--tok-bar-empty)', borderRadius: '2px', overflow: 'hidden' }}>
-            <div style={{ width: `${(it.calls / maxCalls) * 100}%`, height: '100%', background: 'var(--tok-accent-primary)' }} />
-          </div>
-        </div>
-      ))}
-      {items.length > 0 && (
-        <div class="mt-row" style={{ borderTop: '1px solid var(--tok-divider)', marginTop: '6px', paddingTop: '6px' }}>
-          <span class="n" style={{ color: 'var(--tok-text-muted)' }}>
-            {items.length} total · {totalCalls} calls
-          </span>
-          <span class="s">${totalCost.toFixed(2)}</span>
-        </div>
-      )}
-    </div>
+    <>
+      <table class="fp">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th class="num">Calls</th>
+            <th class="num">Tokens</th>
+            <th class="num">Cost</th>
+            <th class="num">$/call</th>
+            <th>Share</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.slice(0, 15).map(it => (
+            <tr key={it.name}>
+              <td style={{ fontFamily: '"SF Mono", Consolas, monospace', fontSize: '11px' }}>{it.name}</td>
+              <td class="num">{it.calls}</td>
+              <td class="num">{fmtTokK(it.tokens)}</td>
+              <td class="num">${it.cost.toFixed(3)}</td>
+              <td class="num" style={{ color: 'var(--tok-text-muted)' }}>
+                {it.calls > 0 ? `$${(it.cost / it.calls).toFixed(3)}` : '—'}
+              </td>
+              <td>
+                <div class="share-bar">
+                  <div style={{ width: `${(it.calls / maxCalls) * 100}%` }} />
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr style={{ borderTop: '1px solid var(--tok-divider)', fontWeight: 500 }}>
+            <td style={{ color: 'var(--tok-text-muted)', fontSize: '11px' }}>
+              {items.length} {items.length === 1 ? 'entry' : 'entries'} total
+            </td>
+            <td class="num" style={{ color: 'var(--tok-text-muted)' }}>{totalCalls}</td>
+            <td class="num" style={{ color: 'var(--tok-text-muted)' }}>{fmtTokK(totalTokens)}</td>
+            <td class="num" style={{ color: 'var(--tok-text-muted)' }}>${totalCost.toFixed(3)}</td>
+            <td class="num" style={{ color: 'var(--tok-text-muted)' }}>
+              {totalCalls > 0 ? `$${(totalCost / totalCalls).toFixed(3)}` : '—'}
+            </td>
+            <td />
+          </tr>
+        </tfoot>
+      </table>
+    </>
   );
 }

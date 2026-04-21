@@ -1,0 +1,68 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- squircle base: orange → red → deep terra -->
+    <radialGradient id="p-base" cx="0.35" cy="0.25" r="1.1">
+      <stop offset="0"   stop-color="#FFD066"/>
+      <stop offset=".28" stop-color="#F79A3B"/>
+      <stop offset=".62" stop-color="#E76024"/>
+      <stop offset="1"   stop-color="#9E3410"/>
+    </radialGradient>
+    <!-- top specular highlight -->
+    <linearGradient id="p-spec" x1="0.5" x2="0.5" y1="0" y2="1">
+      <stop offset="0"   stop-color="#FFFFFF" stop-opacity=".55"/>
+      <stop offset=".35" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <!-- bottom inner shadow for depth -->
+    <radialGradient id="p-shadow" cx="0.5" cy="1.1" r="0.8">
+      <stop offset="0" stop-color="#2B0D05" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#2B0D05" stop-opacity="0"/>
+    </radialGradient>
+    <!-- petal shading: white puffy -->
+    <radialGradient id="p-petal" cx="0.45" cy="0.35" r="0.9">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset=".55" stop-color="#FCE9D6"/>
+      <stop offset="1" stop-color="#E7B48B"/>
+    </radialGradient>
+    <clipPath id="sq-clip">
+      <path d="M 96 32 L 416 32 Q 480 32 480 96 L 480 416 Q 480 480 416 480 L 96 480 Q 32 480 32 416 L 32 96 Q 32 32 96 32 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- base squircle -->
+  <g clip-path="url(#sq-clip)">
+    <rect x="0" y="0" width="512" height="512" fill="url(#p-base)"/>
+    <rect x="0" y="0" width="512" height="512" fill="url(#p-spec)"/>
+    <rect x="0" y="0" width="512" height="512" fill="url(#p-shadow)"/>
+    <!-- subtle inner contour -->
+    <path d="M 96 36 L 416 36 Q 476 36 476 96 L 476 416"
+          fill="none" stroke="#FFE3B0" stroke-width="2" opacity=".35"/>
+  </g>
+
+  <!-- 6-petal data bloom — lengths encode token-usage histogram -->
+  <g transform="translate(256 256)">
+    <!-- petal shadows -->
+    <g transform="translate(6 10)" opacity=".28">
+      <ellipse cx="0" cy="-72" rx="22" ry="60" fill="#6B1E08"/>
+      <g transform="rotate(60)"><ellipse cx="0" cy="-92" rx="22" ry="78" fill="#6B1E08"/></g>
+      <g transform="rotate(120)"><ellipse cx="0" cy="-130" rx="22" ry="120" fill="#6B1E08"/></g>
+      <g transform="rotate(180)"><ellipse cx="0" cy="-108" rx="22" ry="96" fill="#6B1E08"/></g>
+      <g transform="rotate(240)"><ellipse cx="0" cy="-86" rx="22" ry="72" fill="#6B1E08"/></g>
+      <g transform="rotate(300)"><ellipse cx="0" cy="-62" rx="22" ry="50" fill="#6B1E08"/></g>
+    </g>
+    <!-- petals -->
+    <ellipse cx="0" cy="-72" rx="22" ry="60" fill="url(#p-petal)"/>
+    <g transform="rotate(60)"><ellipse cx="0" cy="-92" rx="22" ry="78" fill="url(#p-petal)"/></g>
+    <g transform="rotate(120)"><ellipse cx="0" cy="-130" rx="22" ry="120" fill="url(#p-petal)"/></g>
+    <g transform="rotate(180)"><ellipse cx="0" cy="-108" rx="22" ry="96" fill="url(#p-petal)"/></g>
+    <g transform="rotate(240)"><ellipse cx="0" cy="-86" rx="22" ry="72" fill="url(#p-petal)"/></g>
+    <g transform="rotate(300)"><ellipse cx="0" cy="-62" rx="22" ry="50" fill="url(#p-petal)"/></g>
+    <!-- center hub -->
+    <circle cx="0" cy="0" r="20" fill="url(#p-petal)"/>
+    <circle cx="-4" cy="-4" r="6" fill="#FFFFFF" opacity=".8"/>
+  </g>
+
+  <!-- top gloss sheen -->
+  <g clip-path="url(#sq-clip)" opacity=".4" style="mix-blend-mode:overlay;">
+    <path d="M 30 60 Q 260 110 490 60 L 490 200 Q 260 260 30 200 Z" fill="#FFFFFF" opacity=".45"/>
+  </g>
+</svg>

@@ -1,6 +1,7 @@
 import { useMemo } from 'preact/hooks';
 import type { WebviewData } from '../../src/types';
 import { buildModelColorMap } from '../utils/model-utils';
+import { useTimeRange } from './time-range-context';
 
 function fmtDur(m: number): string {
   if (!Number.isFinite(m) || m < 1) return '—';
@@ -28,6 +29,12 @@ export function TabProjects({ data }: { data: Partial<WebviewData> }) {
   const todaySplit = data.todayProjectBreakdown  ?? [];
   const sessions   = data.recentSessions         ?? [];
   const weekSpend  = data.spend?.week            ?? 0;
+
+  const { range } = useTimeRange();
+  const showToday = range === 'today';
+  const periodLabel = range === 'today' ? 'Today' : range === '7d' ? '7d' : range === '30d' ? '30d' : 'All time';
+
+  const todaySpend = useMemo(() => todaySplit.reduce((s, p) => s + p.cost, 0), [todaySplit]);
 
   const top       = projects[0] ?? null;
   const topShare  = top && weekSpend > 0 ? (top.cost / weekSpend) * 100 : 0;
@@ -80,17 +87,24 @@ export function TabProjects({ data }: { data: Partial<WebviewData> }) {
       <div class="fp-section">
         <div class="fp-stats">
           <div class="fp-stat">
-            <div class="fp-stat-k">Active projects</div>
-            <div class="fp-stat-v">{projects.length}</div>
-            <div class="fp-stat-n">≥1 session · 7d</div>
+            <div class="fp-stat-k">Active projects · {periodLabel}</div>
+            <div class="fp-stat-v">{showToday ? todaySplit.length : projects.length}</div>
+            <div class="fp-stat-n">≥1 session · {periodLabel}</div>
           </div>
-          {top && (
+          {top && !showToday && (
             <div class="fp-stat">
               <div class="fp-stat-k">Top project</div>
               <div class="fp-stat-v" style={{ fontSize: '16px' }}>{top.name}</div>
               <div class="fp-stat-n">
                 {topShare > 0 ? `${topShare.toFixed(0)}% of weekly spend` : '7d'}
               </div>
+            </div>
+          )}
+          {showToday && todaySplit.length > 0 && (
+            <div class="fp-stat">
+              <div class="fp-stat-k">Today spend</div>
+              <div class="fp-stat-v">${todaySpend.toFixed(2)}</div>
+              <div class="fp-stat-n">across {todaySplit.length} project{todaySplit.length !== 1 ? 's' : ''}</div>
             </div>
           )}
           {lastActive && (
@@ -135,9 +149,9 @@ export function TabProjects({ data }: { data: Partial<WebviewData> }) {
       )}
 
       {/* ── Project ranking table ── */}
-      {projects.length > 0 && (
+      {!showToday && projects.length > 0 && (
         <div class="fp-section">
-          <h3>Project ranking · 7d</h3>
+          <h3>Project ranking · {periodLabel}</h3>
           <table class="fp">
             <thead>
               <tr>
@@ -175,7 +189,7 @@ export function TabProjects({ data }: { data: Partial<WebviewData> }) {
       )}
 
       {/* ── Top project drill ── */}
-      {top && (topModelMix.length > 0 || topSessions.length > 0) && (
+      {!showToday && top && (topModelMix.length > 0 || topSessions.length > 0) && (
         <div class="fp-section">
           <h3>Top project drill · {top.name}</h3>
           <div class="two-col">

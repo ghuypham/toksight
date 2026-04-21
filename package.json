@@ -5,9 +5,10 @@
   "version": "0.1.0",
   "publisher": "toksight",
   "license": "MIT",
+  "icon": "public/icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/toksight/toksight.git"
+    "url": "https://github.com/toksight/toksight"
   },
   "engines": {
     "vscode": "^1.85.0"
@@ -25,7 +26,7 @@
         {
           "id": "toksight",
           "title": "TokSight",
-          "icon": "$(pulse)"
+          "icon": "public/icon-activity-bar.svg"
         }
       ]
     },
@@ -88,7 +89,7 @@
           "type": "number",
           "default": 0,
           "minimum": 0,
-          "description": "Your 5h window budget ($USD, API-equivalent). When > 0, Spend slide shows % of cap + ETA. Leave 0 to show raw $ only. Anthropic does not publish exact caps — see https://www.anthropic.com/pricing for plan details."
+          "description": "Your 5h window budget ($USD, API-equivalent). When > 0, Spend slide shows % of cap + ETA. Leave 0 to show raw $ only."
         },
         "toksight.oauthEnabled": {
           "type": "boolean",
@@ -104,8 +105,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "tsc --noEmit",
-    "package": "vsce package",
-    "dump-snapshot": "npx tsx scripts/dump-snapshot.ts && open plans/260417-1352-ui-value-audit-redesign/mockup.html"
+    "package": "vsce package"
   },
   "devDependencies": {
     "@types/jsdom": "^28.0.1",

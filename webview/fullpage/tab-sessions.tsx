@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'preact/hooks';
 import type { WebviewData, TodaySessionSummary, ActiveSessionDetail } from '../../src/types';
 import { getModelFamilyName } from '../utils/model-utils';
+import { useTimeRange } from './time-range-context';
 
 function fmtDur(m: number): string {
   if (!Number.isFinite(m) || m < 1) return '—';
@@ -86,6 +87,10 @@ export function TabSessions({ data }: { data: Partial<WebviewData> }) {
   const stats     = data.sessionStats;
   const weekSpend = data.spend?.week ?? 0;
 
+  const { range } = useTimeRange();
+  const showToday = range === 'today';
+  const periodLabel = range === 'today' ? 'Today' : range === '7d' ? '7d' : range === '30d' ? '30d' : 'All time';
+
   const [projFilter, setProjFilter] = useState('');
   const [modelFilter, setModelFilter] = useState('');
 
@@ -95,6 +100,12 @@ export function TabSessions({ data }: { data: Partial<WebviewData> }) {
     (!projFilter  || s.project === projFilter) &&
     (!modelFilter || s.model   === modelFilter),
   ), [sessions, projFilter, modelFilter]);
+
+  /* Today aggregates */
+  const todaySpend = useMemo(() => today.reduce((s, t) => s + t.costUsd, 0), [today]);
+  const todayAvgDur = today.length > 0
+    ? today.reduce((s, t) => s + t.durationMinutes, 0) / today.length
+    : 0;
 
   /* Longest session for stat box */
   const longest = today.length > 0
@@ -107,14 +118,14 @@ export function TabSessions({ data }: { data: Partial<WebviewData> }) {
       <div class="fp-section">
         <div class="fp-stats">
           <div class="fp-stat">
-            <div class="fp-stat-k">Sessions · 7d</div>
-            <div class="fp-stat-v">{sessions.length}</div>
-            <div class="fp-stat-n">7d window</div>
+            <div class="fp-stat-k">Sessions · {periodLabel}</div>
+            <div class="fp-stat-v">{showToday ? today.length : sessions.length}</div>
+            <div class="fp-stat-n">{periodLabel} window</div>
           </div>
           <div class="fp-stat">
             <div class="fp-stat-k">Avg duration</div>
-            <div class="fp-stat-v">{stats ? fmtDur(stats.avgDurationMinutes) : '—'}</div>
-            <div class="fp-stat-n">7d window</div>
+            <div class="fp-stat-v">{showToday ? fmtDur(todayAvgDur) : stats ? fmtDur(stats.avgDurationMinutes) : '—'}</div>
+            <div class="fp-stat-n">{periodLabel} window</div>
           </div>
           <div class="fp-stat">
             <div class="fp-stat-k">Longest</div>
@@ -123,8 +134,8 @@ export function TabSessions({ data }: { data: Partial<WebviewData> }) {
           </div>
           <div class="fp-stat">
             <div class="fp-stat-k">Total spend</div>
-            <div class="fp-stat-v">${weekSpend.toFixed(2)}</div>
-            <div class="fp-stat-n">7d window</div>
+            <div class="fp-stat-v">${showToday ? todaySpend.toFixed(2) : weekSpend.toFixed(2)}</div>
+            <div class="fp-stat-n">{periodLabel} window</div>
           </div>
         </div>
       </div>
@@ -145,10 +156,39 @@ export function TabSessions({ data }: { data: Partial<WebviewData> }) {
         </div>
       )}
 
-      {/* ── Sessions table ── */}
-      {sessions.length > 0 && (
+      {/* ── Today sessions table (range=today) ── */}
+      {showToday && today.length > 0 && (
         <div class="fp-section">
-          <h3>Sessions · 7d</h3>
+          <h3>Sessions · Today</h3>
+          <table class="fp">
+            <thead>
+              <tr>
+                <th>Started</th>
+                <th>Ended</th>
+                <th>Model</th>
+                <th class="num">Dur</th>
+                <th class="num">Cost</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...today].reverse().map(s => (
+                <tr key={s.sessionId}>
+                  <td>{new Date(s.startTs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+                  <td>{new Date(s.endTs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+                  <td>{getModelFamilyName(s.dominantModel)}</td>
+                  <td class="num">{fmtDur(s.durationMinutes)}</td>
+                  <td class="num">${s.costUsd.toFixed(2)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* ── Sessions table (range≠today) ── */}
+      {!showToday && sessions.length > 0 && (
+        <div class="fp-section">
+          <h3>Sessions · {periodLabel}</h3>
           <div class="fp-filters">
             <select
               value={projFilter}

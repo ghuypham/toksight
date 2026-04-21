@@ -27,6 +27,7 @@ const fixture: WebviewData = {
   tools: [{ name: 'Read', calls: 30, tokens: 8000, cost: 0.05 }],
   mcp: [],
   skills: [{ name: 'react-best-practices', calls: 5, tokens: 2000, cost: 0.02 }],
+  agents: [],
   projects: [],
   recentSessions: [],
   activeSession: null,
@@ -49,7 +50,7 @@ const fixture: WebviewData = {
   cacheSavings: 0.03,
   tokenBreakdown: { output: 600, input: 3000, cache: 1400, cacheCreation: 0, outputPct: 12, inputPct: 60, cachePct: 28, cacheCreationPct: 0 },
   sessionStats: { avgCostPerSession: 0.06, avgDurationMinutes: 25 },
-  summary: { totalToolCalls: 30, mcpCount: 0, skillCount: 1, projectCount: 1 },
+  summary: { totalToolCalls: 30, mcpCount: 0, skillCount: 1, agentCount: 0, projectCount: 1 },
 };
 
 const sampleLimits: UsageLimits = {

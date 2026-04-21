@@ -7,7 +7,8 @@ interface ModelMixBarProps {
 }
 
 /** Stacked model mix bar with per-model cost display */
-export function ModelMixBar({ modelMix }: ModelMixBarProps) {
+export function ModelMixBar({ modelMix: rawModelMix }: ModelMixBarProps) {
+  const modelMix = rawModelMix.filter(m => m.model !== '<synthetic>');
   if (modelMix.length === 0) return null;
   // Distinct color per row, palette ordered by mix order
   const colorMap = buildModelColorMap(modelMix.map((m) => m.model));
