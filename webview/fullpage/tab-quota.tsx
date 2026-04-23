@@ -1,4 +1,5 @@
 import type { WebviewData, SparklinePoint } from '../../src/types';
+import { quotaBarClass, quotaSeverity } from '../utils/quota-severity';
 
 /** Format minutes as "~Xh Ym" or "~Ym" */
 function fmtEta(m: number): string {
@@ -28,12 +29,8 @@ function dayLabel(dateStr: string, isLast: boolean): string {
   return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()] ?? dateStr.slice(5);
 }
 
-/** Bar fill class based on utilisation pct */
-function barFillClass(pct: number): string {
-  if (pct >= 90) return 'fp-bar-fill danger';
-  if (pct >= 75) return 'fp-bar-fill warn';
-  return 'fp-bar-fill';
-}
+/** Bar fill class — delegates to shared helper (danger ≥80, warn ≥60). */
+const barFillClass = quotaBarClass;
 
 export function TabQuota({ data }: { data: Partial<WebviewData> }) {
   const limits    = data.usageLimits ?? null;
@@ -68,7 +65,7 @@ export function TabQuota({ data }: { data: Partial<WebviewData> }) {
             {weekPct != null && (
               <div class="fp-stat hero">
                 <div class="fp-stat-k">Week · all models</div>
-                <div class={`fp-stat-v ${weekPct >= 90 ? 'danger' : weekPct >= 75 ? 'warn' : weekPct >= 50 ? 'accent' : ''}`}>
+                <div class={`fp-stat-v ${quotaSeverity(weekPct) === 'danger' ? 'danger' : quotaSeverity(weekPct) === 'warn' ? 'warn' : weekPct > 0 ? 'accent' : ''}`}>
                   {Math.round(weekPct)}%
                 </div>
                 <div class="fp-hero-bar">
@@ -264,6 +261,43 @@ export function TabQuota({ data }: { data: Partial<WebviewData> }) {
               </div>
             )}
           </div>
+          {/* Input/Output split bar — makes outputRatio legible as "how much
+           *  of what Claude processed was actually answering vs reading".
+           *  Left = input (read), right = output (generated). */}
+          {outputRatio > 0 && (
+            <div style={{ marginTop: 12 }}>
+              <div class="fp-row">
+                <span class="fp-row-label">Input vs output</span>
+                <span class="fp-row-value" style={{ color: 'var(--tok-text-muted)' }}>
+                  {Math.round((1 - outputRatio) * 100)}% in · {Math.round(outputRatio * 100)}% out
+                </span>
+              </div>
+              <div style={{
+                display: 'flex',
+                height: 8,
+                borderRadius: 4,
+                overflow: 'hidden',
+                background: 'var(--tok-bar-empty)',
+                marginTop: 4,
+              }}>
+                <div
+                  title={`input ${Math.round((1 - outputRatio) * 100)}%`}
+                  style={{
+                    width: `${(1 - outputRatio) * 100}%`,
+                    background: 'var(--tok-text-secondary)',
+                    opacity: 0.6,
+                  }}
+                />
+                <div
+                  title={`output ${Math.round(outputRatio * 100)}%`}
+                  style={{
+                    width: `${outputRatio * 100}%`,
+                    background: 'var(--tok-accent-primary)',
+                  }}
+                />
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

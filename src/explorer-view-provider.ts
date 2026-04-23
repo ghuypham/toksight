@@ -63,12 +63,13 @@ export class ExplorerViewProvider implements vscode.WebviewViewProvider {
       vscode.Uri.joinPath(this.extensionUri, 'dist', 'explorer.js'),
     );
 
+    // Strict CSP: only our nonced script + inline styles. No network — the
+    // extension must stay offline per the zero-network contract in CLAUDE.md.
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-${nonce}'; style-src 'unsafe-inline' https://fonts.googleapis.com; style-src-elem 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com;">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-${nonce}'; style-src 'unsafe-inline';">
   <style nonce="${nonce}">${CLAUDE_THEME_CSS}
     body { margin: 0; padding: 0; }
   </style>

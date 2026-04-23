@@ -1,5 +1,6 @@
 import type { ExplorerData } from '../../src/types';
 import { theme, claude } from '../styles/theme';
+import { SurfaceLabel } from '../components/surface-label';
 
 /**
  * Slide 3 — LAST SESSION (recap, mockup §1 Slide 3).
@@ -49,10 +50,8 @@ export function SlideRecap({ data }: { data: ExplorerData }) {
   if (!lr) {
     return (
       <div>
-        <div style={{ fontFamily: theme.sans, fontSize: 10, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--vscode-descriptionForeground)', marginBottom: 8 }}>
-          Last session
-        </div>
-        <div style={{ padding: '30px 0', textAlign: 'center', color: 'var(--vscode-disabledForeground)', fontSize: 12, lineHeight: 1.5 }}>
+        <SurfaceLabel>LAST SESSION</SurfaceLabel>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--vscode-disabledForeground)', fontSize: 12, lineHeight: 1.5, textAlign: 'center' }}>
           No recent session.<br />
           Recaps appear for sessions within the last 24h.
         </div>
@@ -65,14 +64,12 @@ export function SlideRecap({ data }: { data: ExplorerData }) {
     return (
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
-          <span style={{ fontFamily: theme.sans, fontSize: 10, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--vscode-descriptionForeground)' }}>
-            Last session
-          </span>
+          <SurfaceLabel>LAST SESSION</SurfaceLabel>
           <span style={{ fontFamily: theme.mono, fontSize: 10, color: 'var(--vscode-descriptionForeground)' }}>
             {relativeTime(lr.lastActivityTime)}
           </span>
         </div>
-        <div style={{ padding: '30px 0', textAlign: 'center', color: 'var(--vscode-disabledForeground)', fontSize: 12, lineHeight: 1.5 }}>
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', color: 'var(--vscode-disabledForeground)', fontSize: 12, lineHeight: 1.5 }}>
           Recap pending.<br />
           Anthropic processes session data within 24h.
         </div>
@@ -85,11 +82,9 @@ export function SlideRecap({ data }: { data: ExplorerData }) {
   const frictionSummary = summarizeFriction(r.frictionCounts);
 
   return (
-    <div>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
-        <span style={{ fontFamily: theme.sans, fontSize: 12, fontWeight: 600, color: 'var(--vscode-foreground)' }}>
-          Last session
-        </span>
+        <SurfaceLabel>LAST SESSION</SurfaceLabel>
         <span style={{ fontFamily: theme.mono, fontSize: 10, color: 'var(--vscode-descriptionForeground)' }}>
           {relativeTime(lr.lastActivityTime)}
         </span>
@@ -108,7 +103,7 @@ export function SlideRecap({ data }: { data: ExplorerData }) {
         &ldquo;{r.briefSummary}&rdquo;
       </div>
 
-      {/* KV rows */}
+      {/* KV rows — text labels + enum values (no numbers), sans */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 3, fontFamily: theme.sans, fontSize: 11 }}>
         <span style={{ color: 'var(--vscode-disabledForeground)' }}>outcome</span>
         <span style={{ fontFamily: theme.mono, fontSize: 10, color: outcomeColor(r.outcome) }}>{r.outcome}</span>
@@ -118,9 +113,9 @@ export function SlideRecap({ data }: { data: ExplorerData }) {
         <span style={{ fontFamily: theme.mono, fontSize: 10, color: helpfulColor(r.claudeHelpfulness) }}>{r.claudeHelpfulness}</span>
       </div>
 
-      {/* Meta line: +lines / -lines · commits · files */}
+      {/* Meta line — numeric throughout, mono (per user 2026-04-24) */}
       {meta && (meta.linesAdded > 0 || meta.linesRemoved > 0 || meta.gitCommits > 0 || meta.filesModified > 0) && (
-        <div style={{ marginTop: 8, fontFamily: theme.sans, fontSize: 10, color: 'var(--vscode-descriptionForeground)' }}>
+        <div style={{ marginTop: 8, fontFamily: theme.mono, fontSize: 10, color: 'var(--vscode-descriptionForeground)' }}>
           <span style={{ color: claude.trendUp }}>+{meta.linesAdded}</span>
           {' / '}
           <span style={{ color: claude.trendDown }}>-{meta.linesRemoved}</span>
@@ -131,9 +126,9 @@ export function SlideRecap({ data }: { data: ExplorerData }) {
         </div>
       )}
 
-      {/* Friction */}
+      {/* Friction — counts (×N) so mono whole */}
       {frictionSummary && (
-        <div style={{ marginTop: 6, fontFamily: theme.sans, fontSize: 10, color: claude.trendDown }}>
+        <div style={{ marginTop: 6, fontFamily: theme.mono, fontSize: 10, color: claude.trendDown }}>
           friction: {frictionSummary}
         </div>
       )}

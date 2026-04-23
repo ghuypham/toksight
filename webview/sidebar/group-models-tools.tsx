@@ -1,7 +1,7 @@
 import type { WebviewData } from '../../src/types';
 import { GroupHeader } from './group-header';
 import { GroupEmpty } from './group-empty';
-import { getModelDisplayName, buildModelColorMap } from '../utils/model-utils';
+import { getModelDisplayName, buildModelColorMap, isVisibleModelRow } from '../utils/model-utils';
 
 /** Shared styles for subsection label (.mt-sub) */
 const mtSubStyle: Record<string, string | number> = {
@@ -40,14 +40,15 @@ const mtStatStyle: Record<string, string | number> = {
   color: 'var(--tok-text-muted)',
 };
 
-/** Colored model chip dot (8×8px square) — color resolved from caller-provided map */
+/** Colored model dot (6×6px round) — matches explorer/widget model-dot shape
+ *  so the "this is a model" visual language is consistent across surfaces. */
 function ModelChip({ color }: { color: string }) {
   return (
     <span style={{
       display: 'inline-block',
-      width: 8,
-      height: 8,
-      borderRadius: 2,
+      width: 6,
+      height: 6,
+      borderRadius: '50%',
       background: color,
       flexShrink: 0,
     }} />
@@ -98,10 +99,11 @@ function fmtTokens(t: number): string {
 }
 
 /**
- * GROUP: MODELS & TOOLS — 3 subsections matching mockup:
- *   Model mix → stacked bar + per-model mt-row (chip + name · $cost · %)
- *   Top tools → up to 5 mt-row (name · calls · tokens)
- *   MCP · Skills → up to 5 mt-row (name · calls)
+ * GROUP: MODELS & TOOLS — 4 subsections:
+ *   Model mix  → stacked bar + per-model mt-row (chip + name · $cost · %)
+ *   Top tools  → up to 5 mt-row (name · calls · tokens)
+ *   MCP servers → up to 5 mt-row (name · calls)
+ *   Skills     → up to 5 mt-row (name · calls)
  */
 export function GroupModelsTools({ data }: { data: WebviewData }) {
   const hasModels = data.modelMix.length > 0;
@@ -117,14 +119,14 @@ export function GroupModelsTools({ data }: { data: WebviewData }) {
     );
   }
 
-  // Merge MCP + Skills into one subsection, sorted by calls desc
-  const mcpSkills = [
-    ...(data.mcp ?? []).map((m) => ({ name: m.name, calls: m.calls })),
-    ...(data.skills ?? []).map((s) => ({ name: s.name, calls: s.calls })),
-  ].sort((a, b) => b.calls - a.calls).slice(0, 5);
+  const mcpList = (data.mcp ?? []).slice(0, 5);
+  const skillList = (data.skills ?? []).slice(0, 5);
+
+  // Filter out zero-cost <synthetic> entries — they add noise without signal
+  const visibleModelMix = data.modelMix.filter(isVisibleModelRow);
 
   // Distinct color per model row — palette indexed by mix order
-  const colorMap = buildModelColorMap(data.modelMix.map((m) => m.model));
+  const colorMap = buildModelColorMap(visibleModelMix.map((m) => m.model));
 
   return (
     <GroupHeader label="Models & Tools">
@@ -132,8 +134,8 @@ export function GroupModelsTools({ data }: { data: WebviewData }) {
       {hasModels && (
         <>
           <div style={{ ...mtSubStyle, marginTop: 0 }}>Model mix</div>
-          <ModelStack modelMix={data.modelMix} colorMap={colorMap} />
-          {data.modelMix.map((m) => (
+          <ModelStack modelMix={visibleModelMix} colorMap={colorMap} />
+          {visibleModelMix.map((m) => (
             <div key={m.model} style={mtRowStyle}>
               <span style={mtNameStyle}>
                 <ModelChip color={colorMap[m.model]} />
@@ -160,11 +162,24 @@ export function GroupModelsTools({ data }: { data: WebviewData }) {
         </>
       )}
 
-      {/* MCP · Skills subsection */}
-      {mcpSkills.length > 0 && (
+      {/* MCP servers subsection */}
+      {mcpList.length > 0 && (
         <>
-          <div style={mtSubStyle}>MCP · Skills</div>
-          {mcpSkills.map((s) => (
+          <div style={mtSubStyle}>MCP servers</div>
+          {mcpList.map((m) => (
+            <div key={m.name} style={mtRowStyle}>
+              <span style={mtNameStyle}>{m.name}</span>
+              <span style={mtStatStyle}>{m.calls} calls</span>
+            </div>
+          ))}
+        </>
+      )}
+
+      {/* Skills subsection */}
+      {skillList.length > 0 && (
+        <>
+          <div style={mtSubStyle}>Skills</div>
+          {skillList.map((s) => (
             <div key={s.name} style={mtRowStyle}>
               <span style={mtNameStyle}>{s.name}</span>
               <span style={mtStatStyle}>{s.calls} calls</span>

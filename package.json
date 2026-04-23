@@ -1,25 +1,47 @@
 {
   "name": "toksight",
   "displayName": "TokSight",
-  "description": "Real-time Claude Code usage metrics in your VS Code sidebar",
+  "description": "Real-time Claude Code usage metrics in your VS Code sidebar. Zero network, 100% local.",
   "version": "0.1.0",
-  "publisher": "toksight",
+  "publisher": "ghuypham",
   "license": "MIT",
   "icon": "public/icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/toksight/toksight"
+    "url": "https://github.com/ghuypham/toksight"
+  },
+  "bugs": {
+    "url": "https://github.com/ghuypham/toksight/issues"
+  },
+  "homepage": "https://github.com/ghuypham/toksight#readme",
+  "keywords": [
+    "claude",
+    "claude-code",
+    "anthropic",
+    "usage",
+    "metrics",
+    "tokens",
+    "dashboard",
+    "cost-tracker"
+  ],
+  "galleryBanner": {
+    "color": "#F5F1EA",
+    "theme": "light"
   },
   "engines": {
     "vscode": "^1.85.0"
   },
   "categories": [
+    "Visualization",
     "Other"
   ],
   "activationEvents": [
     "onStartupFinished"
   ],
   "main": "./dist/extension.js",
+  "bin": {
+    "toksight": "./dist/cli.js"
+  },
   "contributes": {
     "viewsContainers": {
       "activitybar": [

@@ -2,6 +2,7 @@ import type { WebviewData } from '../../src/types';
 import { GroupHeader } from './group-header';
 import { GroupEmpty } from './group-empty';
 import { theme } from '../styles/theme';
+import { quotaSeverityColor } from '../utils/quota-severity';
 
 /** Format ISO countdown as "Xh Ym" or "Ym" (empty when null/past). */
 function fmtCountdown(iso: string | null): string {
@@ -18,17 +19,15 @@ function QuotaRow({
   label,
   pct,
   resetsAt,
-  accent,
   showCountdown = false,
 }: {
   label: string;
   pct: number;
   resetsAt: string | null;
-  accent?: string;
   showCountdown?: boolean;
 }) {
   const clamped = Math.max(0, Math.min(100, pct));
-  const barColor = accent ?? theme.coral;
+  const barColor = quotaSeverityColor(pct);
   const countdown = showCountdown ? fmtCountdown(resetsAt) : '';
 
   return (
@@ -42,13 +41,13 @@ function QuotaRow({
         marginBottom: 4,
       }}>
         <span style={{ color: theme.foreground }}>{label}</span>
-        <span style={{ color: theme.descriptionForeground, fontVariantNumeric: 'tabular-nums' }}>
+        <span style={{ fontFamily: theme.mono, color: barColor, fontVariantNumeric: 'tabular-nums', fontWeight: pct >= 80 ? 600 : 400 }}>
           {clamped.toFixed(0)}%
         </span>
       </div>
       <div style={{
         height: 4,
-        background: 'var(--vscode-widget-border)',
+        background: 'var(--tok-bar-empty)',
         borderRadius: 2,
         overflow: 'hidden',
       }}>
@@ -63,7 +62,7 @@ function QuotaRow({
       </div>
       {countdown && (
         <div style={{
-          fontFamily: theme.sans,
+          fontFamily: theme.mono,
           fontSize: 10,
           color: theme.disabledForeground,
           marginTop: 3,
@@ -121,7 +120,6 @@ export function GroupQuota({ data }: { data: WebviewData }) {
           label="5h window"
           pct={limits.fiveHour.utilization}
           resetsAt={limits.fiveHour.resetsAt}
-          accent={theme.coral}
           showCountdown
         />
       )}
@@ -137,7 +135,6 @@ export function GroupQuota({ data }: { data: WebviewData }) {
           label="Weekly · Sonnet"
           pct={limits.sevenDaySonnet.utilization}
           resetsAt={limits.sevenDaySonnet.resetsAt}
-          accent={theme.sonnetBlue}
         />
       )}
       {limits?.sevenDayOpus && (
@@ -145,15 +142,14 @@ export function GroupQuota({ data }: { data: WebviewData }) {
           label="Weekly · Opus"
           pct={limits.sevenDayOpus.utilization}
           resetsAt={limits.sevenDayOpus.resetsAt}
-          accent={theme.coral}
         />
       )}
 
-      {/* Forecast line — matches mockup .quota-forecast */}
+      {/* Forecast line — mixed label+numeric+money, mono whole per user 2026-04-24 */}
       {hasForecast && (
         <div style={{
           marginTop: 4,
-          fontFamily: theme.sans,
+          fontFamily: theme.mono,
           fontSize: 11,
           color: theme.descriptionForeground,
         }}>
@@ -161,7 +157,7 @@ export function GroupQuota({ data }: { data: WebviewData }) {
         </div>
       )}
 
-      {/* Cache savings callout */}
+      {/* Cache savings — label in sans, money in mono */}
       {cacheSaved >= 0.01 && (
         <div style={{
           marginTop: 6,
@@ -169,7 +165,7 @@ export function GroupQuota({ data }: { data: WebviewData }) {
           fontSize: 10,
           color: 'var(--vscode-descriptionForeground)',
         }}>
-          Cache savings this week: <strong style={{ color: theme.activeGreen }}>{fmtCost(cacheSaved)}</strong>
+          Cache savings this week: <strong style={{ fontFamily: theme.mono, color: theme.activeGreen }}>{fmtCost(cacheSaved)}</strong>
         </div>
       )}
     </GroupHeader>

@@ -1,6 +1,6 @@
 import { useMemo } from 'preact/hooks';
 import type { WebviewData } from '../../src/types';
-import { buildModelColorMap } from '../utils/model-utils';
+import { buildModelColorMap, isVisibleModelRow } from '../utils/model-utils';
 import { useTimeRange } from './time-range-context';
 
 function fmtTokK(n: number): string {
@@ -13,7 +13,7 @@ export function TabModelsTools({ data }: { data: Partial<WebviewData> }) {
   const { range } = useTimeRange();
   const periodLabel = range === 'today' ? 'Today' : range === '7d' ? '7d' : range === '30d' ? '30d' : 'All time';
 
-  const modelMix   = (data.modelMix ?? []).filter(m => m.model !== '<synthetic>');
+  const modelMix   = (data.modelMix ?? []).filter(isVisibleModelRow);
   const tools      = data.tools      ?? [];
   const mcp        = data.mcp        ?? [];
   const skills     = data.skills     ?? [];

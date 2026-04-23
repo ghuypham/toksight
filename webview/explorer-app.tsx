@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'preact/hooks';
 import type { ExplorerData } from '../src/types';
 import { theme } from './styles/theme';
-import { getModelColor as modelColor, getModelFamilyName } from './utils/model-utils';
+import { getModelColor as modelColor, getModelDisplayName } from './utils/model-utils';
 import { SlideQuota } from './explorer/slide-quota';
 import { SlideSessionNow } from './explorer/slide-session-now';
 import { SlideRecap } from './explorer/slide-recap';
@@ -11,14 +11,15 @@ let _vs: ReturnType<typeof acquireVsCodeApi> | undefined;
 function getVs() { if (!_vs) _vs = acquireVsCodeApi(); return _vs; }
 
 const MAX_SLIDES = 3;
-const ROTATE_MS = 12000;  // slower cadence — users need time to read each slide
+const ROTATE_MS = 15000;  // 15s — users need time to read dense slides; pin
+                          // button stops rotation entirely for deeper reading
 
 /**
  * ExplorerApp — widget carousel per mockup §1:
  *   Slide 1 QUOTA · Slide 2 SESSION NOW · Slide 3 LAST SESSION (recap, only when produced)
  * Header is dynamic: live dot + active model + slide counter (1/N).
  * Default slide is always Slide 1 (Quota) — the most important view.
- * Auto-rotates every 12s; paused on hover; respects prefers-reduced-motion.
+ * Auto-rotates every 15s; paused on hover; respects prefers-reduced-motion.
  * Slide 3 is only shown when a real recap exists (latestRecap.recap present) —
  * "recap pending" or "no recent session" states are hidden until Anthropic
  * produces the narrative; carousel cycles 1 ↔ 2 in that case.
@@ -27,6 +28,8 @@ export function ExplorerApp() {
   const [data, setData] = useState<ExplorerData | null>(null);
   const [slide, setSlide] = useState(0);
   const [paused, setPaused] = useState(false);
+  /** pinned=true: user explicitly locked the current slide, auto-rotate stops */
+  const [pinned, setPinned] = useState(false);
 
   // Only show slide 3 when Anthropic has produced a real recap narrative.
   const hasRecap = !!data?.latestRecap?.recap;
@@ -51,15 +54,16 @@ export function ExplorerApp() {
     setSlide(i);
   };
 
-  // Auto-rotate — pauses on hover + respects reduced-motion
+  // Auto-rotate — stops when hovering OR pinned; respects reduced-motion
   useEffect(() => {
-    if (paused) return;
+    if (paused || pinned) return;
     const reducedMotion = typeof window !== 'undefined'
       && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     if (reducedMotion) return;
     const timer = setInterval(() => setSlide(s => (s + 1) % visibleSlides), ROTATE_MS);
     return () => clearInterval(timer);
-  }, [paused, slide, visibleSlides]);
+    // `slide` intentionally excluded — steady beat, not reset-on-interaction
+  }, [paused, pinned, visibleSlides]);
 
   return (
     <div
@@ -86,18 +90,22 @@ export function ExplorerApp() {
                   flexShrink: 0, display: 'inline-block',
                 }} />
                 <span style={{ fontFamily: theme.sans, fontSize: 11, color: 'var(--vscode-descriptionForeground)' }}>
-                  {getModelFamilyName(data.activeModel)}
+                  {getModelDisplayName(data.activeModel)}
                 </span>
               </div>
             )}
           </div>
         )}
 
-        {/* Carousel — N single-purpose slides (slide 3 gated by hasRecap) */}
+        {/* Carousel — auto-grows to tallest slide's natural content.
+         *  Flex row with default `align-items: stretch` forces every slide
+         *  to match the tallest one's height. Slides self-contain their
+         *  own layout (no forced height). Per user 2026-04-24: widget
+         *  scales with content, slides stay visually equal. */}
         <div style={{ overflow: 'hidden' }}>
-          <div style={{ display: 'flex', transition: 'transform 0.4s cubic-bezier(0.4,0,0.2,1)', transform: `translateX(-${slide * 100}%)` }}>
+          <div style={{ display: 'flex', alignItems: 'stretch', transition: 'transform 0.4s cubic-bezier(0.4,0,0.2,1)', transform: `translateX(-${slide * 100}%)` }}>
             {Array.from({ length: visibleSlides }, (_, i) => (
-              <div key={i} style={{ minWidth: '100%', flexShrink: 0, minHeight: 140 }}>
+              <div key={i} style={{ minWidth: '100%', flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
                 {data ? (
                   i === 0 ? <SlideQuota data={data} /> :
                   i === 1 ? <SlideSessionNow data={data} /> :
@@ -110,22 +118,55 @@ export function ExplorerApp() {
           </div>
         </div>
 
-        {/* Dots — render only as many as visibleSlides; coral accent for active */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 10 }}>
-          {Array.from({ length: visibleSlides }, (_, i) => (
-            <button
-              key={i}
-              onClick={() => userSetSlide(i)}
-              aria-label={`Slide ${i + 1}`}
-              style={{
-                width: 6, height: 6, borderRadius: '50%',
-                background: i === slide ? theme.coral : 'var(--vscode-descriptionForeground)',
-                opacity: i === slide ? 1 : 0.3,
-                border: 'none', padding: 0, cursor: 'pointer',
-                transition: 'opacity 0.2s, background 0.2s',
-              }}
-            />
-          ))}
+        {/* Bottom bar: dots + pin button — tight spacing so short slides
+         *  (e.g. empty quota state) don't leave a dead gap above controls. */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 8, position: 'relative' }}>
+          {/* Navigation dots */}
+          <div style={{ display: 'flex', gap: 6 }}>
+            {Array.from({ length: visibleSlides }, (_, i) => (
+              <button
+                key={i}
+                onClick={() => userSetSlide(i)}
+                aria-label={`Slide ${i + 1}`}
+                style={{
+                  width: 6, height: 6, borderRadius: '50%',
+                  background: i === slide ? theme.coral : 'var(--vscode-descriptionForeground)',
+                  opacity: i === slide ? 1 : 0.3,
+                  border: 'none', padding: 0, cursor: 'pointer',
+                  transition: 'opacity 0.2s, background 0.2s',
+                }}
+              />
+            ))}
+          </div>
+
+          {/*
+           * Pin button — SECONDARY control: icon + short label, no chrome.
+           * "Pin" / "Pinned" so users can discover the feature without
+           * needing to hover. No border/bg — stays quiet next to the dots.
+           * Coral + full opacity when active.
+           */}
+          <button
+            onClick={() => setPinned(p => !p)}
+            aria-label={pinned ? 'Unpin — resume auto-rotate' : 'Pin this slide to stop auto-rotate'}
+            title={pinned ? 'Unpin — resume auto-rotate' : 'Pin this slide to stop auto-rotate'}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              background: 'transparent',
+              border: 'none',
+              padding: '0 2px',
+              marginLeft: 2,
+              cursor: 'pointer',
+              fontFamily: theme.sans,
+              fontSize: 10,
+              lineHeight: 1,
+              color: pinned ? theme.coral : 'var(--vscode-descriptionForeground)',
+              opacity: pinned ? 1 : 0.65,
+              transition: 'opacity 0.2s, color 0.2s',
+            }}
+          >
+            <span aria-hidden="true">{pinned ? '◆' : '◇'}</span>
+            {pinned ? 'Pinned' : 'Pin'}
+          </button>
         </div>
 
       <style>{`

@@ -1,5 +1,7 @@
 import type { ExplorerData } from '../../src/types';
 import { theme } from '../styles/theme';
+import { quotaSeverityColor } from '../utils/quota-severity';
+import { SurfaceLabel } from '../components/surface-label';
 
 /**
  * Slide 1 — QUOTA (per mockup §1 Slide 1).
@@ -35,33 +37,29 @@ function fmtResetsIn(resetsAt: string | null): string {
   return h > 0 ? `${h}h ${m}m` : `${m}m`;
 }
 
-function pctColor(pct: number): string {
-  if (pct >= 80) return 'var(--tok-danger, #e57373)';
-  if (pct >= 60) return 'var(--tok-warning, #d79b3f)';
-  return 'var(--vscode-descriptionForeground)';
-}
-
-function QuotaRow({ label, meta, pct, warn }: {
+function QuotaRow({ label, meta, pct }: {
   label: string;
   meta?: string;
   pct: number;
-  warn?: boolean;
 }) {
-  const color = warn ? pctColor(pct) : 'var(--vscode-descriptionForeground)';
+  // Severity shared with sidebar + dashboard — single source of truth in
+  // utils/quota-severity.ts. Widget defers to coral at normal levels so each
+  // surface has the same "brand at rest, amber/red under pressure" behavior.
+  const color = quotaSeverityColor(pct);
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 6 }}>
         <span style={{ fontFamily: theme.sans, fontSize: 11, color: 'var(--vscode-foreground)' }}>
           {label}
           {meta && (
-            <span style={{ color: 'var(--vscode-disabledForeground)', fontSize: 10 }}> · {meta}</span>
+            <span style={{ fontFamily: theme.mono, color: 'var(--vscode-disabledForeground)', fontSize: 10 }}> · {meta}</span>
           )}
         </span>
-        <span style={{ fontFamily: theme.mono, fontSize: 12, fontWeight: 600, color: warn ? color : 'var(--vscode-foreground)' }}>
+        <span style={{ fontFamily: theme.mono, fontSize: 12, fontWeight: pct >= 80 ? 700 : 600, color }}>
           {Math.round(pct)}%
         </span>
       </div>
-      <div style={{ height: 3, background: 'var(--vscode-input-background)', borderRadius: 2, overflow: 'hidden', marginTop: 3 }}>
+      <div style={{ height: 3, background: 'var(--tok-bar-empty)', borderRadius: 2, overflow: 'hidden', marginTop: 3 }}>
         <div style={{ height: '100%', width: `${Math.min(pct, 100)}%`, background: color, transition: 'width 0.4s ease' }} />
       </div>
     </>
@@ -78,9 +76,7 @@ export function SlideQuota({ data }: { data: ExplorerData }) {
   if (!hasOAuth && !hasSpark) {
     return (
       <div>
-        <div style={{ fontFamily: theme.sans, fontSize: 10, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--vscode-descriptionForeground)', marginBottom: 8 }}>
-          Quota
-        </div>
+        <SurfaceLabel>QUOTA</SurfaceLabel>
         <div style={{ padding: '30px 0', textAlign: 'center', color: 'var(--vscode-disabledForeground)', fontSize: 12 }}>
           Configure quota or sign in to Claude.
         </div>
@@ -102,9 +98,7 @@ export function SlideQuota({ data }: { data: ExplorerData }) {
 
   return (
     <div>
-      <div style={{ fontFamily: theme.sans, fontSize: 10, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--vscode-descriptionForeground)', marginBottom: 6 }}>
-        Quota
-      </div>
+      <SurfaceLabel>QUOTA</SurfaceLabel>
 
       {/* Usage rows */}
       {fh && (
@@ -112,19 +106,18 @@ export function SlideQuota({ data }: { data: ExplorerData }) {
           label="5h window"
           meta={fmtResetsIn(fh.resetsAt) ? `resets ${fmtResetsIn(fh.resetsAt)}` : undefined}
           pct={fh.utilization}
-          warn
         />
       )}
       {sd && <QuotaRow label="Weekly · all" pct={sd.utilization} />}
       {sdS && <QuotaRow label="Weekly · Sonnet" pct={sdS.utilization} />}
 
-      {/* Forecast box */}
+      {/* Forecast box — mixed label+numeric+money, mono whole (per user 2026-04-24) */}
       {showForecast && (
         <div style={{
           marginTop: 10, padding: '6px 8px',
           background: 'var(--vscode-input-background)',
           borderRadius: 4,
-          fontFamily: theme.sans, fontSize: 11,
+          fontFamily: theme.mono, fontSize: 11,
           color: 'var(--vscode-foreground)',
           display: 'flex', alignItems: 'center', gap: 6,
         }}>
@@ -137,30 +130,50 @@ export function SlideQuota({ data }: { data: ExplorerData }) {
         </div>
       )}
 
-      {/* 7-day sparkline */}
-      {hasSpark && (
-        <div style={{ marginTop: 10 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: theme.sans, fontSize: 9, color: 'var(--vscode-disabledForeground)', marginBottom: 3 }}>
-            <span>Last 7 days</span>
-            <span>today <strong style={{ color: 'var(--vscode-foreground)' }}>{fmtCost(data.todaySpend)}</strong></span>
+      {/* 7-day sparkline — fixed chart height (50px). User feedback
+       *  2026-04-24: don't flex-grow this; slide is sized by content,
+       *  not the chart. */}
+      {hasSpark && (() => {
+        const avg = spark.reduce((s, p) => s + p.cost, 0) / spark.length;
+        const avgPct = maxCost > 0 ? (avg / maxCost) * 100 : 0;
+        return (
+          <div style={{ marginTop: 10 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: theme.mono, fontSize: 9, color: 'var(--vscode-disabledForeground)', marginBottom: 3 }}>
+              <span>Last 7 days · avg {fmtCost(avg)}</span>
+              <span>today <strong style={{ color: 'var(--vscode-foreground)' }}>{fmtCost(data.todaySpend)}</strong></span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 2, height: 50, position: 'relative', marginTop: 8 }}>
+              {/* Avg reference line */}
+              {avgPct > 0 && (
+                <div
+                  title={`avg ${fmtCost(avg)}`}
+                  style={{
+                    position: 'absolute', left: 0, right: 0,
+                    bottom: `${avgPct}%`,
+                    height: 1,
+                    borderTop: '1px dashed var(--vscode-widget-border)',
+                    opacity: 0.6,
+                    pointerEvents: 'none',
+                  }}
+                />
+              )}
+              {spark.map((p, i) => {
+                const h = (p.cost / maxCost) * 100;
+                const isToday = i === todayIdx;
+                return (
+                  <div key={i} data-spark-bar style={{
+                    flex: 1,
+                    height: `${Math.max(h, 4)}%`,
+                    background: isToday ? theme.coral : 'var(--vscode-descriptionForeground)',
+                    opacity: isToday ? 1 : 0.35,
+                    borderRadius: '1px 1px 0 0',
+                  }} title={`${p.date}: ${fmtCost(p.cost)}`} />
+                );
+              })}
+            </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 2, height: 22 }}>
-            {spark.map((p, i) => {
-              const h = (p.cost / maxCost) * 100;
-              const isToday = i === todayIdx;
-              return (
-                <div key={i} data-spark-bar style={{
-                  flex: 1,
-                  height: `${Math.max(h, 4)}%`,
-                  background: isToday ? theme.coral : 'var(--vscode-descriptionForeground)',
-                  opacity: isToday ? 1 : 0.35,
-                  borderRadius: '1px 1px 0 0',
-                }} title={`${p.date}: ${fmtCost(p.cost)}`} />
-              );
-            })}
-          </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

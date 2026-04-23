@@ -86,3 +86,14 @@ export function getModelFamilyName(model: string | null | undefined): string {
   const family = getModelFamily(model);
   return family ? capitalize(family) : (model ?? '');
 }
+
+/**
+ * Filter helper — hide <synthetic> entries when cost = 0.
+ * <synthetic> is a virtual model Claude Code uses internally; it adds noise
+ * to model lists when it has no real spend to show.
+ * Still shows if cost > 0 (transparency: real spend was attributed).
+ */
+export function isVisibleModelRow(m: { model: string; cost: number }): boolean {
+  const isSynth = /^<synthetic/.test(m.model);
+  return !(isSynth && m.cost === 0);
+}

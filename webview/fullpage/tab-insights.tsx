@@ -1,5 +1,6 @@
 import { useMemo } from 'preact/hooks';
 import type { WebviewData, SessionRecap, SessionMetaUi } from '../../src/types';
+import { quotaSeverity } from '../utils/quota-severity';
 
 function fmtDur(m: number): string {
   if (!Number.isFinite(m) || m < 1) return '—';
@@ -23,15 +24,29 @@ function helpBucket(h: string): '5' | '4' | '3' | 'low' {
   return 'low';
 }
 
-/** Horizontal distribution row with bar */
-function DistRow({ k, v, pct, muted }: { k: string; v: string; pct: number; muted?: boolean }) {
+/** Horizontal distribution row with bar. `tone` drives bar color for severity. */
+function DistRow({ k, v, pct, muted, tone }: {
+  k: string; v: string; pct: number; muted?: boolean; tone?: 'warn' | 'danger';
+}) {
+  const fillClass = ['dist-fill', muted ? 'muted' : '', tone ?? '']
+    .filter(Boolean).join(' ');
   return (
     <div class="dist-row">
       <div class="dist-k">{k}</div>
       <div class="dist-bar">
-        <div class={`dist-fill${muted ? ' muted' : ''}`} style={{ width: `${Math.min(pct, 100)}%` }} />
+        <div class={fillClass} style={{ width: `${Math.min(pct, 100)}%` }} />
       </div>
       <div class="dist-v">{v}</div>
+    </div>
+  );
+}
+
+/** Plain insight line — no bar. For rule-based insights + KPI callouts. */
+function InsightLine({ k, v }: { k: string; v?: string }) {
+  return (
+    <div class="fp-insight-line">
+      <span class="k">{k}</span>
+      {v && <span class="v">{v}</span>}
     </div>
   );
 }
@@ -136,40 +151,45 @@ export function TabInsights({ data }: { data: Partial<WebviewData> }) {
       )}
 
       {/* ── Live insights ── */}
-      {(insights.length > 0 || limits || burn) && (
+      {/* Rule-based insights + quota severity row + KPI callouts.
+       * Bars are reserved for the quota row (real utilization %).
+       * Cache / peak burn are KPI callouts, not distributions — shown as plain
+       * lines. Previous version abused DistRow with arbitrary normalization
+       * (cache /10, burn /0.5) which misled the eye. */}
+      {(insights.length > 0 || limits?.fiveHour || cacheSaved > 0 || (burn && burn.peakCostUsd > 0)) && (
         <div class="fp-section">
           <h3>Live insights</h3>
           {/* Rule-based insights from engine */}
           {insights.map((ins, i) => (
-            <div key={i} class="dist-row">
-              <div class="dist-k">{ins.icon} {ins.text}</div>
-              <div class="dist-bar" style={{ background: 'transparent' }} />
-              <div class="dist-v">{ins.sub ?? ''}</div>
-            </div>
+            <InsightLine key={i} k={`${ins.icon} ${ins.text}`} v={ins.sub} />
           ))}
-          {/* Quota warning dist-row if 5h available */}
-          {limits?.fiveHour && (
-            <DistRow
-              k={`⚠ 5h window ${Math.round(limits.fiveHour.utilization)}%`}
-              pct={limits.fiveHour.utilization}
-              v={limits.fiveHour.resetsAt
-                ? `resets ${fmtResetsShort(limits.fiveHour.resetsAt)}`
-                : ''}
-            />
-          )}
-          {/* Cache savings */}
+          {/* Quota 5h — real distribution, severity-colored */}
+          {limits?.fiveHour && (() => {
+            const pct = limits.fiveHour.utilization;
+            const sev = quotaSeverity(pct);
+            const tone = sev === 'danger' ? 'danger' : sev === 'warn' ? 'warn' : undefined;
+            return (
+              <DistRow
+                k={`${sev === 'safe' ? '•' : '⚠'} 5h window ${Math.round(pct)}%`}
+                pct={pct}
+                tone={tone}
+                v={limits.fiveHour.resetsAt
+                  ? `resets ${fmtResetsShort(limits.fiveHour.resetsAt)}`
+                  : ''}
+              />
+            );
+          })()}
+          {/* Cache savings — KPI, no bar */}
           {cacheSaved > 0 && (
-            <DistRow
-              k="💾 Cache saved"
-              pct={Math.min((cacheSaved / 10) * 100, 100)}
-              v={`$${cacheSaved.toFixed(2)} / 7d`}
+            <InsightLine
+              k="💾 Cache saved · 7d"
+              v={`$${cacheSaved.toFixed(2)}`}
             />
           )}
-          {/* Peak burn */}
+          {/* Peak burn — KPI, no bar */}
           {burn && burn.peakCostUsd > 0 && (
-            <DistRow
+            <InsightLine
               k="🔥 Peak burn"
-              pct={Math.min((burn.peakCostUsd / 0.5) * 100, 100)}
               v={`$${burn.peakCostUsd.toFixed(3)}/min${burn.peakMinutesAgo > 0 ? ` · ${burn.peakMinutesAgo}m ago` : ''}`}
             />
           )}

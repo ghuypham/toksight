@@ -37,17 +37,31 @@ const explorerConfig = {
   jsxImportSource: 'preact',
 };
 
+// CLI bundle — standalone Node.js executable (no vscode, no webview)
+const cliConfig = {
+  entryPoints: ['src/cli.ts'],
+  bundle: true,
+  outfile: 'dist/cli.js',
+  format: 'cjs',
+  platform: 'node',
+  target: 'node20',
+  sourcemap: true,
+  banner: { js: '#!/usr/bin/env node' },
+};
+
 if (isWatch) {
-  const extCtx = await esbuild.context(extensionConfig);
-  const webCtx = await esbuild.context(webviewConfig);
-  const explorerCtx = await esbuild.context(explorerConfig);
-  await Promise.all([extCtx.watch(), webCtx.watch(), explorerCtx.watch()]);
+  const extCtx     = await esbuild.context(extensionConfig);
+  const webCtx     = await esbuild.context(webviewConfig);
+  const explorerCtx= await esbuild.context(explorerConfig);
+  const cliCtx     = await esbuild.context(cliConfig);
+  await Promise.all([extCtx.watch(), webCtx.watch(), explorerCtx.watch(), cliCtx.watch()]);
   console.log('Watching for changes...');
 } else {
   await Promise.all([
     esbuild.build(extensionConfig),
     esbuild.build(webviewConfig),
     esbuild.build(explorerConfig),
+    esbuild.build(cliConfig),
   ]);
   console.log('Build complete.');
 }

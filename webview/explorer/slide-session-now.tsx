@@ -1,6 +1,7 @@
 import type { ExplorerData } from '../../src/types';
 import { theme, claude } from '../styles/theme';
-import { getModelFamilyName, buildModelColorMap } from '../utils/model-utils';
+import { getModelDisplayName, buildModelColorMap, isVisibleModelRow } from '../utils/model-utils';
+import { SurfaceLabel } from '../components/surface-label';
 
 /**
  * Slide 2 — SESSION NOW (v2, mockup-aligned).
@@ -44,7 +45,17 @@ function projectName(path: string): string {
 function Cell({ k, v, color }: { k: string; v: string; color?: string }) {
   return (
     <div>
-      <div style={{ fontSize: 9, letterSpacing: '0.3px', textTransform: 'uppercase', color: 'var(--vscode-disabledForeground)', marginBottom: 2 }}>
+      {/* Micro overline — sans uppercase, muted. NOT SurfaceLabel (that's
+       *  for section headings). Column labels live below section hierarchy. */}
+      <div style={{
+        fontFamily: theme.sans,
+        fontSize: 9,
+        fontWeight: 500,
+        textTransform: 'uppercase' as const,
+        letterSpacing: '0.5px',
+        color: 'var(--tok-text-muted)',
+        marginBottom: 2,
+      }}>
         {k}
       </div>
       <div style={{ fontFamily: theme.mono, fontSize: 12, fontWeight: 600, color: color ?? 'var(--vscode-foreground)' }}>
@@ -59,9 +70,7 @@ export function SlideSessionNow({ data }: { data: ExplorerData }) {
   if (!s) {
     return (
       <div>
-        <div style={{ fontFamily: theme.sans, fontSize: 10, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--vscode-descriptionForeground)', marginBottom: 8 }}>
-          Session
-        </div>
+        <SurfaceLabel>SESSION</SurfaceLabel>
         <div style={{ padding: '30px 0', textAlign: 'center', color: 'var(--vscode-disabledForeground)', fontSize: 12 }}>
           No active Claude session.
         </div>
@@ -77,8 +86,8 @@ export function SlideSessionNow({ data }: { data: ExplorerData }) {
   // Burn rate — prefer session-level; fall back to global nowPerMin
   const burn = s.burnRatePerMin > 0 ? s.burnRatePerMin : data.burnRate.nowPerMin;
 
-  // Model mix today — top 3 rows + tail aggregator
-  const mix = data.modelMixToday.slice().sort((a, b) => b.cost - a.cost);
+  // Model mix today — filter <synthetic> zero-cost, top 3 rows + tail aggregator
+  const mix = data.modelMixToday.filter(isVisibleModelRow).slice().sort((a, b) => b.cost - a.cost);
   const topMix = mix.slice(0, 3);
   const tail = mix.slice(3);
   const tailCost = tail.reduce((sum, m) => sum + m.cost, 0);
@@ -87,26 +96,27 @@ export function SlideSessionNow({ data }: { data: ExplorerData }) {
 
   return (
     <div>
+      <SurfaceLabel>SESSION</SurfaceLabel>
       {/* Title */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
         <span style={{ fontFamily: theme.sans, fontSize: 12, fontWeight: 600, color: 'var(--vscode-foreground)' }}>
-          {projectName(s.projectPath)} · <span style={{ color: 'var(--vscode-descriptionForeground)', fontWeight: 500 }}>{getModelFamilyName(s.model)}</span>
+          {projectName(s.projectPath)} · <span style={{ color: 'var(--vscode-descriptionForeground)', fontWeight: 500 }}>{getModelDisplayName(s.model)}</span>
         </span>
         <span style={{ fontFamily: theme.mono, fontSize: 10, color: 'var(--vscode-descriptionForeground)' }}>
           {fmtMinutes(s.durationMinutes)}
         </span>
       </div>
 
-      {/* Context */}
+      {/* Context — mixed label+numeric, mono whole (per user 2026-04-24) */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
-        <span style={{ fontFamily: theme.sans, fontSize: 11, color: 'var(--vscode-descriptionForeground)' }}>
+        <span style={{ fontFamily: theme.mono, fontSize: 11, color: 'var(--vscode-descriptionForeground)' }}>
           Context · {(s.contextTokens / 1000).toFixed(0)}k / {(s.contextLimit / 1000).toFixed(0)}k
         </span>
         <span style={{ fontFamily: theme.mono, fontSize: 12, fontWeight: 600, color: ctxColor }}>
           {s.contextPct}%
         </span>
       </div>
-      <div style={{ height: 4, background: 'var(--vscode-input-background)', borderRadius: 2, overflow: 'hidden' }}>
+      <div style={{ height: 4, background: 'var(--tok-bar-empty)', borderRadius: 2, overflow: 'hidden' }}>
         <div style={{ height: '100%', width: `${Math.min(s.contextPct, 100)}%`, background: ctxColor, transition: 'width 0.4s ease' }} />
       </div>
       {showCompactHint && (
@@ -116,7 +126,7 @@ export function SlideSessionNow({ data }: { data: ExplorerData }) {
       )}
 
       {/* Cell row: Spent · Burn · Saved */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginTop: 10, paddingTop: 8, borderTop: '1px solid var(--vscode-widget-border)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginTop: 7, paddingTop: 7, borderTop: '1px solid var(--vscode-widget-border)' }}>
         <Cell k="Spent" v={fmtCost(data.activeSessionSpent)} color={theme.coral} />
         <Cell k="Burn" v={`${fmtBurn(burn)}/m`} />
         <Cell k="Saved" v={fmtCost(data.activeSessionSaved)} color={claude.trendUp} />
@@ -124,10 +134,8 @@ export function SlideSessionNow({ data }: { data: ExplorerData }) {
 
       {/* Model mix today */}
       {mix.length > 0 && (
-        <div style={{ marginTop: 10, paddingTop: 8, borderTop: '1px solid var(--vscode-widget-border)' }}>
-          <div style={{ fontSize: 9, letterSpacing: '0.3px', textTransform: 'uppercase', color: 'var(--vscode-disabledForeground)', marginBottom: 4 }}>
-            Today
-          </div>
+        <div style={{ marginTop: 7, paddingTop: 7, borderTop: '1px solid var(--vscode-widget-border)' }}>
+          <SurfaceLabel>TODAY</SurfaceLabel>
           {/* stack bar */}
           <div style={{ display: 'flex', height: 4, borderRadius: 2, overflow: 'hidden', marginBottom: 6 }}>
             {mix.map((m) => (
@@ -150,7 +158,7 @@ export function SlideSessionNow({ data }: { data: ExplorerData }) {
             </div>
           ))}
           {tail.length > 0 && (
-            <div style={{ marginTop: 3, fontFamily: theme.sans, fontSize: 10, color: 'var(--vscode-disabledForeground)' }}>
+            <div style={{ marginTop: 3, fontFamily: theme.mono, fontSize: 10, color: 'var(--vscode-disabledForeground)' }}>
               +{tail.length} other · {fmtCost(tailCost)}
             </div>
           )}

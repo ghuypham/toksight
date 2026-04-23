@@ -2,6 +2,7 @@ import type { WebviewData, ActiveSessionDetail, BurnRateData } from '../../src/t
 import { GroupHeader } from './group-header';
 import { GroupEmpty } from './group-empty';
 import { getModelDisplayName } from '../utils/model-utils';
+import { theme } from '../styles/theme';
 
 /** Format path as short project name: last non-empty segment. */
 function fmtProject(path: string): string {
@@ -35,12 +36,7 @@ function SessionCard({ session }: { session: ActiveSessionDetail }) {
   const durationStr = fmtDuration(session.durationMinutes);
 
   return (
-    <div style={{
-      padding: '8px 10px',
-      background: 'var(--tok-bg-sunken)',
-      borderRadius: 6,
-      marginBottom: 6,
-    }}>
+    <div>
       {/* proj · model */}
       <div style={{
         fontFamily: "'SF Mono', 'JetBrains Mono', monospace",
@@ -50,8 +46,9 @@ function SessionCard({ session }: { session: ActiveSessionDetail }) {
       }}>
         {project} · {model}
       </div>
-      {/* meta + cost */}
+      {/* meta + cost — numeric, so mono font (per user 2026-04-24) */}
       <div style={{
+        fontFamily: theme.mono,
         fontSize: 10,
         color: 'var(--tok-text-muted)',
         display: 'flex',
@@ -91,6 +88,11 @@ function SidebarBurnChart({ data }: { data: BurnRateData }) {
         {bars.map((b, i) => {
           const heightPct = Math.max((b.costUsd / max) * 100, b.costUsd > 0 ? 4 : 2);
           const isPeak = b.minuteOffset === data.peakMinutesAgo && b.costUsd > 0;
+          const isNow = b.minuteOffset === 0;
+          // Age-based opacity: rightmost (now) full, oldest faded — same ramp
+          // as widget burn chart. Peak keeps its warning hue to stand out.
+          const ageRatio = bars.length > 1 ? (bars.length - 1 - i) / (bars.length - 1) : 0;
+          const opacity = isNow ? 1 : isPeak ? 1 : 0.85 - ageRatio * 0.5;
           return (
             <div
               key={i}
@@ -98,7 +100,7 @@ function SidebarBurnChart({ data }: { data: BurnRateData }) {
               style={{
                 height: `${heightPct}%`,
                 background: isPeak ? 'var(--tok-warning)' : 'var(--tok-accent-primary)',
-                opacity: isPeak ? 1 : 0.45,
+                opacity,
                 borderRadius: '1px 1px 0 0',
                 minHeight: 2,
               }}
@@ -106,8 +108,9 @@ function SidebarBurnChart({ data }: { data: BurnRateData }) {
           );
         })}
       </div>
-      {/* Caption */}
+      {/* Caption — numeric/money throughout, so mono font (per user 2026-04-24) */}
       <div style={{
+        fontFamily: theme.mono,
         fontSize: 10,
         color: 'var(--tok-text-muted)',
         marginTop: 4,

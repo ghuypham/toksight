@@ -28,7 +28,9 @@ const TAB_TITLE: Record<TabId, string> = {
 
 const FULLPAGE_CSS = `
   .fp-shell {
-    background: var(--tok-bg-surface);
+    /* Dashboard lives in an editor tab (createWebviewPanel) — blend with
+     * editor-background, not editorWidget (that's the floating-popup color). */
+    background: var(--vscode-editor-background, var(--tok-bg-sunken));
     color: var(--tok-text-primary);
     overflow: hidden;
     min-height: 100vh;
@@ -44,15 +46,16 @@ const FULLPAGE_CSS = `
     flex-shrink: 0;
   }
   .fp-title {
-    font-family: Georgia, serif;
-    font-size: 20px;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 16px;
+    font-weight: 500;
     margin: 0;
-    letter-spacing: -0.01em;
+    letter-spacing: normal;
     color: var(--tok-text-primary);
   }
   .fp-time {
     padding: 7px 14px 7px 10px;
-    background: var(--tok-bg-sunken);
+    background: var(--tok-bg-surface);
     border: 0;
     border-radius: 6px;
     font-size: 12px;
@@ -66,7 +69,9 @@ const FULLPAGE_CSS = `
     flex: 1;
   }
   .fp-nav {
-    background: var(--tok-bg-base);
+    /* Inside editor tab — use section-header tint, not sideBar-background
+     * (sideBar color inside editor reads like a misplaced sidebar). */
+    background: var(--vscode-sideBarSectionHeader-background, transparent);
     padding: 16px 10px;
     border-right: 1px solid var(--tok-divider);
     display: flex;
@@ -75,8 +80,9 @@ const FULLPAGE_CSS = `
   }
   .fp-nav-item {
     padding: 10px 14px;
-    font-family: Georgia, serif;
+    font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
     font-size: 11px;
+    font-weight: 500;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--tok-text-secondary);
@@ -105,11 +111,13 @@ const FULLPAGE_CSS = `
   }
   .fp-section:last-child { margin-bottom: 0; }
   .fp-section h3 {
-    font-family: Georgia, serif;
-    font-size: 14px;
+    font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-size: 10px;
+    font-weight: 500;
     margin: 0 0 12px 0;
-    color: var(--tok-text-secondary);
-    letter-spacing: 0.01em;
+    color: var(--tok-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
   .fp-stats {
     display: grid;
@@ -117,7 +125,7 @@ const FULLPAGE_CSS = `
     gap: 12px;
   }
   .fp-stat {
-    background: var(--tok-bg-sunken);
+    background: var(--tok-bg-surface);
     border-radius: 8px;
     padding: 14px 16px;
     box-shadow: var(--tok-ring);
@@ -137,13 +145,15 @@ const FULLPAGE_CSS = `
     margin-bottom: 6px;
   }
   .fp-stat-v {
-    font-family: Georgia, serif;
-    font-size: 22px;
+    font-family: var(--vscode-editor-font-family, ui-monospace, SFMono-Regular, Consolas, monospace);
+    font-size: 18px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
     color: var(--tok-text-primary);
     line-height: 1.1;
   }
   .fp-stat.hero .fp-stat-v {
-    font-size: 40px;
+    font-size: 28px;
     font-weight: 300;
     letter-spacing: -0.02em;
   }
@@ -169,7 +179,7 @@ const FULLPAGE_CSS = `
   /* 7-day spend big chart */
   .spend7-wrap {
     position: relative;
-    background: var(--tok-bg-sunken);
+    background: var(--tok-bg-surface);
     border-radius: 8px;
     padding: 14px;
   }
@@ -224,7 +234,7 @@ const FULLPAGE_CSS = `
     gap: 10px;
   }
   .tc {
-    background: var(--tok-bg-sunken);
+    background: var(--tok-bg-surface);
     padding: 10px 12px;
     border-radius: 6px;
     box-shadow: var(--tok-ring);
@@ -237,7 +247,8 @@ const FULLPAGE_CSS = `
   }
   .tc-v {
     font-family: "SF Mono", Consolas, monospace;
-    font-size: 14px;
+    font-size: 18px;
+    font-weight: 500;
     color: var(--tok-text-primary);
     margin-top: 4px;
   }
@@ -265,6 +276,7 @@ const FULLPAGE_CSS = `
     margin-bottom: 6px;
   }
   .fp-bar-fill { height: 100%; background: var(--tok-accent-primary); border-radius: 3px; }
+  .fp-bar-fill.safe   { background: var(--tok-severity-safe); }
   .fp-bar-fill.warn   { background: var(--tok-warning); }
   .fp-bar-fill.danger { background: var(--tok-danger); }
   .fp-bar-fill.muted  { background: var(--tok-text-secondary); opacity: 0.55; }
@@ -278,7 +290,7 @@ const FULLPAGE_CSS = `
   /* cache card */
   .cache-card {
     padding: 16px;
-    background: var(--tok-bg-sunken);
+    background: var(--tok-bg-surface);
     border-radius: 8px;
   }
   .cache-card h4 {
@@ -298,7 +310,8 @@ const FULLPAGE_CSS = `
   .cc-k { font-size: 12px; color: var(--tok-text-secondary); }
   .cc-v {
     font-family: "SF Mono", monospace;
-    font-size: 14px;
+    font-size: 18px;
+    font-weight: 500;
     color: var(--tok-text-primary);
   }
   /* two-col grid — 3:2 ratio so the left quota bars breathe; cache card fills right */
@@ -308,17 +321,19 @@ const FULLPAGE_CSS = `
   @media (max-width: 900px) { .three-col { grid-template-columns: 1fr; } }
   /* drill card */
   .drill-card {
-    background: var(--tok-bg-sunken);
+    background: var(--tok-bg-surface);
     border-radius: 10px;
     padding: 14px 16px;
     box-shadow: var(--tok-ring);
   }
   .drill-card h4 {
     margin: 0 0 10px 0;
-    font-family: Georgia, serif;
-    font-weight: 400;
-    font-size: 13px;
-    color: var(--tok-text-primary);
+    font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-weight: 600;
+    font-size: 11px;
+    color: var(--tok-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
   }
   /* mt-rows */
   .mt-row {
@@ -405,7 +420,7 @@ const FULLPAGE_CSS = `
     padding: 6px 10px;
     font-size: 12px;
     font-family: inherit;
-    background: var(--tok-bg-sunken);
+    background: var(--tok-bg-surface);
     color: var(--tok-text-primary);
     border: 0;
     border-radius: 5px;
@@ -432,7 +447,7 @@ const FULLPAGE_CSS = `
   }
   /* active session card */
   .active-card {
-    background: var(--tok-bg-sunken);
+    background: var(--tok-bg-surface);
     border-radius: 10px;
     padding: 14px 16px;
     box-shadow: var(--tok-ring);
@@ -450,7 +465,7 @@ const FULLPAGE_CSS = `
   }
   /* recap hero */
   .recap-hero {
-    background: var(--tok-bg-sunken);
+    background: var(--tok-bg-surface);
     border-radius: 10px;
     padding: 14px 16px;
     box-shadow: var(--tok-ring);
@@ -458,8 +473,9 @@ const FULLPAGE_CSS = `
   }
   .recap-hero:last-child { margin-bottom: 0; }
   .rh-title {
-    font-family: Georgia, serif;
-    font-size: 14px;
+    font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+    font-weight: 500;
+    font-size: 13px;
     color: var(--tok-text-primary);
     margin-bottom: 4px;
   }
@@ -475,7 +491,22 @@ const FULLPAGE_CSS = `
   }
   .dist-fill { height: 100%; background: var(--tok-accent-primary); border-radius: 4px; }
   .dist-fill.muted { background: var(--tok-text-secondary); opacity: 0.55; }
+  .dist-fill.warn { background: var(--tok-warning); }
+  .dist-fill.danger { background: var(--tok-danger); }
   .dist-v { flex: 0 0 auto; color: var(--tok-text-muted); font-variant-numeric: tabular-nums; }
+  /* insight line — rule-based insight or KPI without a distribution bar */
+  .fp-insight-line {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 10px; padding: 6px 0; font-size: 12px;
+    border-bottom: 1px solid var(--tok-divider);
+  }
+  .fp-insight-line:last-child { border-bottom: 0; }
+  .fp-insight-line .k { color: var(--tok-text-primary); }
+  .fp-insight-line .v {
+    color: var(--tok-text-muted); font-variant-numeric: tabular-nums;
+    font-family: var(--vscode-editor-font-family, ui-monospace, monospace);
+    font-size: 11px;
+  }
   /* insights tab */
   .insights-tab ul { list-style: none; padding: 0; margin: 0; }
   .insights-tab li {

@@ -1,0 +1,25 @@
+# Files and directories excluded from `git archive` (public export).
+# Keeps private dev artifacts out of the open-source mirror repo.
+# See docs/branch-release-strategy.md for full flow.
+
+.claude/          export-ignore
+.gitnexus/        export-ignore
+.superpowers/     export-ignore
+plans/            export-ignore
+docs/             export-ignore
+release-assets/   export-ignore
+scripts/          export-ignore
+
+RELEASE-PLAN.md   export-ignore
+AGENTS.md         export-ignore
+CLAUDE.md         export-ignore
+DESIGN.md         export-ignore
+GEMINI.md         export-ignore
+
+mockup-data.json  export-ignore
+mockup.html       export-ignore
+
+# Line endings — consistent across Windows contributors
+* text=auto eol=lf
+*.sh text eol=lf
+*.ps1 text eol=crlf

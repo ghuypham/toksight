@@ -93,10 +93,11 @@ export const theme = {
   sonnetBlue: '#5B9BD5',
   haikuGray: '#999999',
 
-  // Fonts
+  // Fonts — inherit from VS Code so the extension never ships a webfont.
+  // Fallbacks are system stacks that exist on every platform (no network).
   serif: "Georgia, 'Times New Roman', serif",
-  sans: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-  mono: "'JetBrains Mono', 'SF Mono', 'Consolas', monospace",
+  sans: "var(--vscode-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif)",
+  mono: "var(--vscode-editor-font-family, ui-monospace, SFMono-Regular, Consolas, monospace)",
 
   // Layout
   ring: '0px 0px 0px 1px var(--vscode-widget-border)',

@@ -4,8 +4,11 @@ import { EventEmitter } from 'node:events';
 import { parseJsonlContent } from './jsonl-parser';
 import type { ParsedMessage } from './types';
 
-/** A session is "active" if its JSONL file was written within this window. */
-const ACTIVE_THRESHOLD_MS = 5 * 60_000;
+/** A session is "active" if its JSONL file was written within this window.
+ *  1h chosen to survive long think-time / tab-switch idles — widget was
+ *  flipping to OFFLINE while users were still actively reading Claude's
+ *  output between prompts. Drops truly idle sessions after 60min of silence. */
+const ACTIVE_THRESHOLD_MS = 60 * 60_000;
 
 export interface WatcherEvents {
   data: [messages: ParsedMessage[], isLive: boolean];
@@ -71,9 +74,9 @@ export class JsonlWatcher extends EventEmitter {
   }
 
   /**
-   * Check if any session is currently active (file modified < 5 min ago).
-   * 5min matches Anthropic's session window concept — long enough to survive
-   * normal user think-time pauses but short enough to drop truly idle sessions.
+   * Check if any session is currently active (file modified < 60 min ago).
+   * 1h chosen to survive long think-time / tab-switch idles while still
+   * dropping truly idle sessions.
    */
   isAnySessionActive(): boolean {
     try {

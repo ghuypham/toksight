@@ -13,6 +13,7 @@ import { BarList } from './components/bar-list';
 import { RecentSessions } from './components/recent-sessions';
 import { InsightsList } from './components/insights-list';
 import { GroupNow } from './sidebar/group-now';
+import { GroupContext } from './sidebar/group-context';
 import { GroupToday } from './sidebar/group-today';
 import { GroupQuota } from './sidebar/group-quota';
 import { GroupModelsTools } from './sidebar/group-models-tools';
@@ -34,7 +35,9 @@ function toBarItems(
 }
 
 const ANIMATIONS_CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+/* Typography inherits VS Code's own font stack (--vscode-font-family /
+ * --vscode-editor-font-family). No external font requests — the extension
+ * must stay fully offline per the zero-network contract in CLAUDE.md. */
 * { box-sizing: border-box; }
 
 /* === Keyframes === */
@@ -189,7 +192,7 @@ export function App() {
         padding: '20px',
         textAlign: 'center',
         color: theme.disabledForeground,
-        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        fontFamily: theme.sans,
         fontSize: '13px',
       }}>
         <p>No Claude Code sessions found.</p>
@@ -225,7 +228,7 @@ export function App() {
   const todayBlock = (
     <div data-section="2" style={{ padding: '14px 0' }}>
       <div style={{
-        fontFamily: "'Inter', sans-serif",
+        fontFamily: theme.sans,
         fontSize: '10px',
         fontWeight: 500,
         textTransform: 'uppercase',
@@ -238,7 +241,7 @@ export function App() {
       <TodayGrid today={data.today} />
       {data.summary && (
         <div style={{
-          fontFamily: "'Inter', sans-serif",
+          fontFamily: theme.sans,
           fontSize: '11px',
           color: theme.disabledForeground,
           textAlign: 'center',
@@ -344,7 +347,7 @@ export function App() {
   const footnoteBlock = (
     <div style={{
       padding: '8px 0 16px',
-      fontFamily: "'Inter', sans-serif",
+      fontFamily: theme.sans,
       fontSize: '10px',
       color: theme.disabledForeground,
       fontStyle: 'italic',
@@ -359,7 +362,7 @@ export function App() {
       // Sidebar lives inside a VS Code panel that already adds chrome padding;
       // editor mode is full-bleed and needs the breathing room.
       padding: isEditor ? '0 12px' : '0',
-      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+      fontFamily: theme.sans,
     }}>
       <style>{ANIMATIONS_CSS}</style>
 
@@ -370,9 +373,10 @@ export function App() {
         /* ── Editor mode: full-page left-nav + 4 tabs ── */
         <FullPageApp data={data} />
       ) : (
-        /* ── Sidebar mode: 5 labeled groups — NOW → TODAY → QUOTA → MODELS&TOOLS → INSIGHTS ── */
+        /* ── Sidebar mode: 6 labeled groups — NOW → CONTEXT → TODAY → QUOTA → MODELS&TOOLS → INSIGHTS ── */
         <>
           <GroupNow data={data} primaryUnit={primaryUnit} />
+          <GroupContext data={data} />
           <GroupToday data={data} />
           <GroupQuota data={data} />
           <GroupModelsTools data={data} />
