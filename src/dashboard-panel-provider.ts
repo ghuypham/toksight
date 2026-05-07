@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as crypto from 'node:crypto';
-import type { WebviewData } from './types';
+import type { WebviewData, SessionDetail } from './types';
 import { CLAUDE_THEME_CSS } from '../webview/styles/theme';
 
 /** Full-screen dashboard panel using same Preact app as sidebar */
@@ -8,8 +8,14 @@ export class DashboardPanelProvider {
   public static readonly viewType = 'toksight.dashboard';
   private panel?: vscode.WebviewPanel;
   private lastData?: WebviewData;
+  private onSessionRequest?: (sessionId: string) => void;
 
   constructor(private readonly extensionUri: vscode.Uri) {}
+
+  /** Register callback for `requestSession` messages from the webview. */
+  onRequestSession(cb: (sessionId: string) => void): void {
+    this.onSessionRequest = cb;
+  }
 
   /** Open or focus the dashboard panel */
   open(): void {
@@ -31,10 +37,12 @@ export class DashboardPanelProvider {
 
     this.panel.webview.html = this.buildHtml();
 
-    this.panel.webview.onDidReceiveMessage((msg: { type: string }) => {
+    this.panel.webview.onDidReceiveMessage((msg: { type: string; payload?: unknown }) => {
       if (msg.type === 'ready' && this.lastData) {
         this.panel?.webview.postMessage({ type: 'update', data: this.lastData });
         this.panel?.webview.postMessage({ type: 'mode', data: 'editor' });
+      } else if (msg.type === 'requestSession' && typeof msg.payload === 'string') {
+        this.onSessionRequest?.(msg.payload);
       }
     });
 
@@ -47,6 +55,11 @@ export class DashboardPanelProvider {
     if (this.panel) {
       this.panel.webview.postMessage({ type: 'update', data });
     }
+  }
+
+  /** Send drill-down session detail (or null when not found) to the panel. */
+  postSessionDetail(detail: SessionDetail | null): void {
+    this.panel?.webview.postMessage({ type: 'sessionDetail', data: detail });
   }
 
   private buildHtml(): string {

@@ -7,7 +7,6 @@ src/**
 webview/**
 test/**
 node_modules/**
-plans/**
 docs/**
 scripts/**
 esbuild.config.mjs
@@ -17,5 +16,8 @@ vitest.config.ts
 AGENTS.md
 CLAUDE.md
 DESIGN.md
-mockup-data.json
+GEMINI.md
+RELEASE-PLAN.md
+mockup.html
+index.html
 *.vsix

@@ -2,6 +2,7 @@ import { useState, useMemo } from 'preact/hooks';
 import type { WebviewData, TodaySessionSummary, ActiveSessionDetail } from '../../src/types';
 import { getModelFamilyName } from '../utils/model-utils';
 import { useTimeRange } from './time-range-context';
+import { TodaySessionsTimeline } from '../components/today-sessions-timeline';
 
 function fmtDur(m: number): string {
   if (!Number.isFinite(m) || m < 1) return '—';
@@ -79,7 +80,12 @@ function ActiveCard({ s }: { s: ActiveSessionDetail }) {
   );
 }
 
-export function TabSessions({ data }: { data: Partial<WebviewData> }) {
+interface TabSessionsProps {
+  data: Partial<WebviewData>;
+  onSelectSession?: (sessionId: string) => void;
+}
+
+export function TabSessions({ data, onSelectSession }: TabSessionsProps) {
   const sessions  = data.recentSessions ?? [];
   const today     = data.todaySessions  ?? [];
   const active    = data.activeSession  ?? null;
@@ -148,6 +154,14 @@ export function TabSessions({ data }: { data: Partial<WebviewData> }) {
         </div>
       )}
 
+      {/* ── Today session bars (clickable for drill-down) ── */}
+      {onSelectSession && today.length > 0 && (
+        <div class="fp-section">
+          <h3>Sessions today · click for detail</h3>
+          <TodaySessionsTimeline sessions={today} onSelect={onSelectSession} />
+        </div>
+      )}
+
       {/* ── Active session ── */}
       {active && (
         <div class="fp-section">
@@ -172,7 +186,11 @@ export function TabSessions({ data }: { data: Partial<WebviewData> }) {
             </thead>
             <tbody>
               {[...today].reverse().map(s => (
-                <tr key={s.sessionId}>
+                <tr
+                  key={s.sessionId}
+                  onClick={onSelectSession ? () => onSelectSession(s.sessionId) : undefined}
+                  style={onSelectSession ? { cursor: 'pointer' } : undefined}
+                >
                   <td>{new Date(s.startTs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
                   <td>{new Date(s.endTs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
                   <td>{getModelFamilyName(s.dominantModel)}</td>
@@ -218,17 +236,24 @@ export function TabSessions({ data }: { data: Partial<WebviewData> }) {
               </tr>
             </thead>
             <tbody>
-              {filtered.map(s => (
-                <tr key={s.id}>
-                  <td>{s.timeAgo}</td>
-                  <td>{s.project}</td>
-                  <td>{s.model}</td>
-                  <td class="num">{fmtDur(s.durationMinutes ?? 0)}</td>
-                  <td class="num">{fmtTokK(s.tokens)}</td>
-                  <td class="num">${s.cost.toFixed(2)}</td>
-                  <td>{s.isActive ? 'active' : '—'}</td>
-                </tr>
-              ))}
+              {filtered.map(s => {
+                const sid = s.fullSessionId ?? s.id;
+                return (
+                  <tr
+                    key={s.id}
+                    onClick={onSelectSession ? () => onSelectSession(sid) : undefined}
+                    style={onSelectSession ? { cursor: 'pointer' } : undefined}
+                  >
+                    <td>{s.timeAgo}</td>
+                    <td>{s.project}</td>
+                    <td>{s.model}</td>
+                    <td class="num">{fmtDur(s.durationMinutes ?? 0)}</td>
+                    <td class="num">{fmtTokK(s.tokens)}</td>
+                    <td class="num">${s.cost.toFixed(2)}</td>
+                    <td>{s.isActive ? 'active' : '—'}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

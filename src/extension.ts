@@ -19,6 +19,7 @@ import {
   buildMessageStream,
   buildToolInvocations,
   buildTodayProjectBreakdown,
+  buildSessionDetail,
   selectLatestRecap,
   computeForecast,
 } from './data-aggregator';
@@ -103,6 +104,31 @@ export function activate(context: vscode.ExtensionContext): void {
       }
     }
   });
+
+  // Drill-down session detail — webview asks for full data on click; we resolve
+  // against the current message cache (no FS round-trip) and post back to caller.
+  const handleSessionRequest = (target: 'sidebar' | 'dashboard') => (sessionId: string) => {
+    if (!watcher) return;
+    const cfg = vscode.workspace.getConfiguration('toksight');
+    const overrides = cfg.get<Record<string, unknown>>('pricingOverrides', {}) as
+      Record<string, Partial<import('./types').ModelPricing>> | undefined;
+    const messages = watcher.getMessages();
+    const sessionProjectMap = watcher.getSessionProjectMap();
+    // Resolve prefix to full id so meta/facets sidecars load by UUID, not slice.
+    let fullId = sessionId;
+    if (sessionId.length < 32) {
+      const found = messages.find(m => m.sessionId.startsWith(sessionId));
+      if (found) fullId = found.sessionId;
+    }
+    const projectPath = sessionProjectMap[fullId] ?? '';
+    const meta = loadSessionMeta(fullId);
+    const facets = loadFacets(fullId);
+    const detail = buildSessionDetail(messages, fullId, projectPath, meta, facets, overrides);
+    if (target === 'sidebar') viewProvider.postSessionDetail(detail);
+    else dashboardProvider.postSessionDetail(detail);
+  };
+  viewProvider.onRequestSession(handleSessionRequest('sidebar'));
+  dashboardProvider.onRequestSession(handleSessionRequest('dashboard'));
 
   // Start watcher
   watcher = new JsonlWatcher(jsonlPath);

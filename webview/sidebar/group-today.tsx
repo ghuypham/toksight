@@ -52,7 +52,13 @@ function Cell({ value, label, accent }: { value: string; label: string; accent?:
   );
 }
 
-export function GroupToday({ data }: { data: WebviewData }) {
+interface GroupTodayProps {
+  data: WebviewData;
+  /** Click handler — invoked with full session id (or 8-char id fallback). */
+  onSelectSession?: (sessionId: string) => void;
+}
+
+export function GroupToday({ data, onSelectSession }: GroupTodayProps) {
   const t = data.today;
   if (t.sessions === 0) {
     return (
@@ -82,16 +88,28 @@ export function GroupToday({ data }: { data: WebviewData }) {
       {/* Recent session rows */}
       {recent.length > 0 && (
         <div style={{ marginTop: 4 }}>
-          {recent.map((s) => (
-            <div key={s.id} style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'baseline',
-              padding: '4px 0',
-              fontFamily: theme.sans,
-              fontSize: 11,
-              borderTop: '1px solid var(--vscode-widget-border)',
-            }}>
+          {recent.map((s) => {
+            const targetId = s.fullSessionId ?? s.id;
+            const handle = onSelectSession ? () => onSelectSession(targetId) : undefined;
+            return (
+            <div
+              key={s.id}
+              onClick={handle}
+              role={handle ? 'button' : undefined}
+              tabIndex={handle ? 0 : undefined}
+              onKeyDown={handle ? (e: KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handle(); }
+              } : undefined}
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'baseline',
+                padding: '4px 0',
+                fontFamily: theme.sans,
+                fontSize: 11,
+                borderTop: '1px solid var(--vscode-widget-border)',
+                cursor: handle ? 'pointer' : 'default',
+              }}>
               <span style={{
                 color: 'var(--vscode-foreground)',
                 overflow: 'hidden',
@@ -111,7 +129,8 @@ export function GroupToday({ data }: { data: WebviewData }) {
                 {fmtCost(s.cost)} · {fmtDuration(s.durationMinutes)} · {s.timeAgo}
               </span>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </GroupHeader>

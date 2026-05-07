@@ -530,14 +530,20 @@ const FULLPAGE_CSS = `
   .proj-split > div { height: 100%; }
 `;
 
+interface FullPageAppProps {
+  data: WebviewData;
+  /** Optional drill-down trigger — App owns modal state; tabs forward clicks here. */
+  onSelectSession?: (sessionId: string) => void;
+}
+
 /** Full-page dashboard: fp-header (brand + time-range) + fp-nav (5 tabs) + active tab body. */
-export function FullPageApp({ data }: { data: WebviewData }) {
+export function FullPageApp({ data, onSelectSession }: FullPageAppProps) {
   const [tab, setTab] = useState<TabId>('quota');
 
   function renderTabContent() {
     switch (tab) {
       case 'quota':        return <TabQuota data={data} />;
-      case 'sessions':     return <TabSessions data={data} />;
+      case 'sessions':     return <TabSessions data={data} onSelectSession={onSelectSession} />;
       case 'projects':     return <TabProjects data={data} />;
       case 'models-tools': return <TabModelsTools data={data} />;
       case 'insights':     return <TabInsights data={data} />;

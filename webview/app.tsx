@@ -1,4 +1,6 @@
-import { useExtensionData, sendToExtension } from './hooks/use-extension-data';
+import { useState } from 'preact/hooks';
+import { useExtensionData, sendToExtension, requestSessionDetail } from './hooks/use-extension-data';
+import { SessionDetailModal } from './components/session-detail-modal';
 import { theme } from './styles/theme';
 import { Header } from './components/header';
 import { TodayGrid } from './components/today-grid';
@@ -182,9 +184,21 @@ svg polygon[data-spark-fill] {
 `;
 
 export function App() {
-  const { data, mode, settings } = useExtensionData();
+  const { data, mode, settings, sessionDetail } = useExtensionData();
   const primaryUnit = settings.primaryUnit;
   const isEditor = mode === 'editor';
+  // Drill-down modal state: which session id we asked about. `null` = closed.
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+  const handleSelectSession = (sessionId: string) => {
+    setActiveSessionId(sessionId);
+    requestSessionDetail(sessionId);
+  };
+  const handleCloseSession = () => setActiveSessionId(null);
+  // Only show detail in modal if it matches what we asked for (avoids stale flashes).
+  const matchesActive = activeSessionId != null && sessionDetail != null
+    && sessionDetail.sessionId.startsWith(activeSessionId);
+  const modalLoading = activeSessionId != null && (sessionDetail === undefined || !matchesActive);
+  const modalDetail = matchesActive ? sessionDetail : (activeSessionId == null ? undefined : null);
 
   if (!data) {
     return (
@@ -331,13 +345,6 @@ export function App() {
     </div>
   );
 
-  const recentSessionsBlock = data.recentSessions && data.recentSessions.length > 0 ? (
-    <div data-section="10">
-      <RecentSessions sessions={data.recentSessions} />
-      <div style={{ height: '1px', background: theme.widgetBorder }} />
-    </div>
-  ) : null;
-
   const insightsBlock = (
     <div data-section="11">
       <InsightsList insights={data.insights} />
@@ -371,13 +378,13 @@ export function App() {
 
       {isEditor ? (
         /* ── Editor mode: full-page left-nav + 4 tabs ── */
-        <FullPageApp data={data} />
+        <FullPageApp data={data} onSelectSession={handleSelectSession} />
       ) : (
         /* ── Sidebar mode: 6 labeled groups — NOW → CONTEXT → TODAY → QUOTA → MODELS&TOOLS → INSIGHTS ── */
         <>
           <GroupNow data={data} primaryUnit={primaryUnit} />
           <GroupContext data={data} />
-          <GroupToday data={data} />
+          <GroupToday data={data} onSelectSession={handleSelectSession} />
           <GroupQuota data={data} />
           <GroupModelsTools data={data} />
           <GroupInsights data={data} />
@@ -407,6 +414,14 @@ export function App() {
 
           {footnoteBlock}
         </>
+      )}
+
+      {activeSessionId !== null && (
+        <SessionDetailModal
+          detail={modalDetail}
+          loading={modalLoading}
+          onClose={handleCloseSession}
+        />
       )}
     </div>
   );

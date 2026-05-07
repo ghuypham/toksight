@@ -90,6 +90,8 @@ export interface ProjectStat {
 /** Recent session for display */
 export interface RecentSession {
   id: string;
+  /** Full UUID — id is truncated for display; this is what backend uses to resolve drill-down. */
+  fullSessionId?: string;
   project: string;
   cost: number;
   tokens: number;
@@ -241,6 +243,8 @@ export interface SessionMeta {
   usesMcp: boolean;
   usesTaskAgent: boolean;
   messageHours: number[];
+  /** Optional first user prompt of the session (from session-meta JSON). */
+  firstPrompt?: string;
 }
 
 /** Data sent from extension host to sidebar webview */
@@ -366,6 +370,7 @@ export interface SessionMetaUi {
   userInterruptions: number;
   usesMcp: boolean;
   usesTaskAgent: boolean;
+  firstPrompt?: string;
 }
 
 /** Message stream entry — full page NOW tab only */
@@ -416,3 +421,52 @@ export interface UsageLimits {
  *   ok      → fetched (windows array may still be empty for free-tier accounts)
  */
 export type UsageLimitsStatus = 'ok' | 'fail' | 'no-auth';
+
+/** Single chronological event inside a session (drill-down timeline). */
+export interface SessionTimelineEvent {
+  ts: string;
+  /** Cost (USD) of the assistant message that produced this event. */
+  costUsd: number;
+  /** Tools invoked at this step (≤ message.toolUses.length). */
+  tools: Array<{ name: string; path?: string }>;
+  /** True if this assistant turn surfaced a known tool error category in meta. */
+  hasError?: boolean;
+}
+
+/** A file touched in a session, with how many Edit/Write calls landed on it. */
+export interface SessionFileEdit {
+  path: string;
+  edits: number;
+}
+
+/**
+ * Drill-down detail for a single session — sent on demand from the extension
+ * to the webview in response to a `requestSession` message.
+ */
+export interface SessionDetail {
+  sessionId: string;
+  projectPath: string;
+  model: string;
+  startTs: string;
+  endTs: string;
+  durationMinutes: number;
+  /** First user prompt text (if available from session-meta sidecar). */
+  firstPrompt?: string;
+  /** Total tokens (input + output + cache read + cache create). */
+  totalTokens: number;
+  tokenMix: TokenBreakdown;
+  /** $ saved this session via cache reads (vs full input price). */
+  cacheSavingsUsd: number;
+  /** Cumulative session spend. */
+  totalCostUsd: number;
+  /** Aggregated tool invocation counts. */
+  toolCounts: Record<string, number>;
+  /** Files touched via Edit/Write with edit count, sorted desc by edits. */
+  filesEdited: SessionFileEdit[];
+  /** Chronological events, oldest-first, ≤ 200 to keep payload bounded. */
+  timeline: SessionTimelineEvent[];
+  /** Optional outcome/recap pulled from facets sidecar. */
+  outcome?: SessionRecap['outcome'];
+  helpfulness?: string;
+  briefSummary?: string;
+}

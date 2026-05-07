@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as crypto from 'node:crypto';
-import type { WebviewData } from './types';
+import type { WebviewData, SessionDetail } from './types';
 import { CLAUDE_THEME_CSS } from '../webview/styles/theme';
 
 /** Provides the sidebar webview panel */
@@ -11,12 +11,18 @@ export class TokSightViewProvider implements vscode.WebviewViewProvider {
   private lastData?: WebviewData;
   private lastSettings?: { carouselInterval: number; primaryUnit: 'cost' | 'tokens' };
   private onResolve?: () => void;
+  private onSessionRequest?: (sessionId: string) => void;
 
   constructor(private readonly extensionUri: vscode.Uri) {}
 
   /** Register callback for when webview first resolves */
   onDidResolve(cb: () => void): void {
     this.onResolve = cb;
+  }
+
+  /** Register callback for `requestSession` messages from the webview. */
+  onRequestSession(cb: (sessionId: string) => void): void {
+    this.onSessionRequest = cb;
   }
 
   resolveWebviewView(
@@ -52,6 +58,8 @@ export class TokSightViewProvider implements vscode.WebviewViewProvider {
         vscode.workspace.getConfiguration('toksight').update(
           'primaryUnit', message.payload, vscode.ConfigurationTarget.Global,
         );
+      } else if (message.type === 'requestSession' && typeof message.payload === 'string') {
+        this.onSessionRequest?.(message.payload);
       }
     });
   }
@@ -66,6 +74,11 @@ export class TokSightViewProvider implements vscode.WebviewViewProvider {
   postSettings(settings: { carouselInterval: number; primaryUnit: 'cost' | 'tokens' }): void {
     this.lastSettings = settings;
     this.view?.webview.postMessage({ type: 'settings', data: settings });
+  }
+
+  /** Send drill-down session detail (or null when not found) to the webview. */
+  postSessionDetail(detail: SessionDetail | null): void {
+    this.view?.webview.postMessage({ type: 'sessionDetail', data: detail });
   }
 
   private getHtml(webview: vscode.Webview): string {

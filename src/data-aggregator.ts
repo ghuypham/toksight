@@ -1,5 +1,5 @@
-import type { ParsedMessage, ToolStat, McpStat, SkillStat, AgentStat, ProjectStat, RecentSession, SparklinePoint, BurnRateData, BurnRateBar, TodaySessionSummary, ActiveSessionDetail, SessionMeta, SessionFacets, SessionRecap, SessionMetaUi, MessageStreamEntry, ToolInvocation } from './types';
-import { calculateCost } from './pricing-table';
+import type { ParsedMessage, ToolStat, McpStat, SkillStat, AgentStat, ProjectStat, RecentSession, SparklinePoint, BurnRateData, BurnRateBar, TodaySessionSummary, ActiveSessionDetail, SessionMeta, SessionFacets, SessionRecap, SessionMetaUi, MessageStreamEntry, ToolInvocation, SessionDetail, SessionTimelineEvent, TokenBreakdown, ModelPricing } from './types';
+import { calculateCost, calculateCacheSavings } from './pricing-table';
 
 export interface AggregatedData {
   tools: ToolStat[];
@@ -148,6 +148,7 @@ export function aggregateData(
       const costPerMin = durationMin > 0 ? s.cost / durationMin : 0;
       return {
         id: id.slice(0, 8),
+        fullSessionId: id,
         project: sessionProjectMap[id] ?? id.slice(0, 8),
         cost: Math.round(s.cost * 100) / 100,
         tokens: s.tokens,
@@ -481,6 +482,7 @@ export function buildSessionMetadata(
       userInterruptions: m.userInterruptions,
       usesMcp: m.usesMcp,
       usesTaskAgent: m.usesTaskAgent,
+      firstPrompt: m.firstPrompt,
     };
   }
   return out;
@@ -625,4 +627,143 @@ export function buildTodayProjectBreakdown(
     })
     .sort((a, b) => b.cost - a.cost)
     .slice(0, 3);
+}
+
+const TIMELINE_MAX_EVENTS = 200;
+
+/**
+ * Build drill-down detail for a session: timeline + token mix + cache savings + outcome.
+ * Returns null when no assistant messages exist for sessionId.
+ *
+ * sessionId may be a full UUID OR a truncated 8-char prefix — caller should pass
+ * the prefix when only that is available; we resolve to the longest matching id.
+ */
+export function buildSessionDetail(
+  messages: ParsedMessage[],
+  sessionId: string,
+  projectPath: string,
+  meta: SessionMeta | null,
+  facets: SessionFacets | null,
+  pricingOverrides?: Record<string, Partial<ModelPricing>>,
+): SessionDetail | null {
+  // Resolve prefix to full id (recentSessions ships truncated id).
+  let resolvedId = sessionId;
+  if (sessionId.length < 32) {
+    const found = messages.find(m => m.sessionId.startsWith(sessionId));
+    if (found) resolvedId = found.sessionId;
+  }
+
+  const sessionMsgs = messages
+    .filter(m => m.sessionId === resolvedId && m.type === 'assistant' && m.usage)
+    .sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+
+  if (sessionMsgs.length === 0) return null;
+
+  const first = sessionMsgs[0];
+  const last = sessionMsgs[sessionMsgs.length - 1];
+  const dominantModel = pickDominantModel(sessionMsgs);
+  const durationMinutes = Math.max(0, Math.round(
+    (new Date(last.timestamp).getTime() - new Date(first.timestamp).getTime()) / 60_000,
+  ));
+
+  // Token breakdown + totals + costs.
+  let inTok = 0, outTok = 0, cacheTok = 0, cacheCreate = 0;
+  let totalCost = 0, savings = 0;
+  for (const m of sessionMsgs) {
+    const u = m.usage!;
+    inTok += u.inputTokens;
+    outTok += u.outputTokens;
+    cacheTok += u.cacheReadTokens;
+    cacheCreate += u.cacheCreationTokens;
+    const model = m.model ?? 'claude-sonnet-4-6';
+    totalCost += calculateCost(u, model, pricingOverrides);
+    savings += calculateCacheSavings(u, model, pricingOverrides);
+  }
+  const totalTokens = inTok + outTok + cacheTok + cacheCreate;
+  const tokenMix: TokenBreakdown = {
+    output: outTok,
+    input: inTok,
+    cache: cacheTok,
+    cacheCreation: cacheCreate,
+    outputPct: totalTokens > 0 ? (outTok / totalTokens) * 100 : 0,
+    inputPct: totalTokens > 0 ? (inTok / totalTokens) * 100 : 0,
+    cachePct: totalTokens > 0 ? (cacheTok / totalTokens) * 100 : 0,
+    cacheCreationPct: totalTokens > 0 ? (cacheCreate / totalTokens) * 100 : 0,
+  };
+
+  // Tool counts — prefer meta.toolCounts when richer (covers tools we don't capture).
+  let toolCounts: Record<string, number>;
+  if (meta?.toolCounts && Object.keys(meta.toolCounts).length > 0) {
+    toolCounts = { ...meta.toolCounts };
+  } else {
+    toolCounts = {};
+    for (const m of sessionMsgs) {
+      for (const t of m.toolUses ?? []) {
+        toolCounts[t.name] = (toolCounts[t.name] ?? 0) + 1;
+      }
+    }
+  }
+
+  // Files edited (from tool invocations) — count Edit/Write per file path.
+  const filesEditedMap = new Map<string, number>();
+  for (const m of sessionMsgs) {
+    for (const t of m.toolUses ?? []) {
+      if ((t.name === 'Edit' || t.name === 'Write') && t.path) {
+        filesEditedMap.set(t.path, (filesEditedMap.get(t.path) ?? 0) + 1);
+      }
+    }
+  }
+  const filesEdited = Array.from(filesEditedMap, ([path, edits]) => ({ path, edits }))
+    .sort((a, b) => b.edits - a.edits || a.path.localeCompare(b.path));
+
+  // Timeline — one event per assistant message that has activity. Cap at TIMELINE_MAX_EVENTS
+  // (newest-kept) to bound payload size for very long sessions.
+  const allEvents: SessionTimelineEvent[] = sessionMsgs.map(m => ({
+    ts: m.timestamp,
+    costUsd: Math.round(calculateCost(m.usage!, m.model ?? 'claude-sonnet-4-6', pricingOverrides) * 10000) / 10000,
+    tools: (m.toolUses ?? []).map(t => ({ name: t.name, path: t.path })),
+  }));
+  // hasError is best-effort: meta only carries totals/categories — we mark events at end of
+  // session if the meta records any error and timeline is non-empty (degraded but useful).
+  if (meta && meta.toolErrors > 0 && allEvents.length > 0) {
+    allEvents[allEvents.length - 1].hasError = true;
+  }
+  const timeline = allEvents.length <= TIMELINE_MAX_EVENTS
+    ? allEvents
+    : allEvents.slice(allEvents.length - TIMELINE_MAX_EVENTS);
+
+  return {
+    sessionId: resolvedId,
+    projectPath,
+    model: dominantModel,
+    startTs: first.timestamp,
+    endTs: last.timestamp,
+    durationMinutes,
+    firstPrompt: meta?.firstPrompt,
+    totalTokens,
+    tokenMix,
+    cacheSavingsUsd: Math.round(savings * 100) / 100,
+    totalCostUsd: Math.round(totalCost * 100) / 100,
+    toolCounts,
+    filesEdited,
+    timeline,
+    outcome: facets?.outcome,
+    helpfulness: facets?.claudeHelpfulness,
+    briefSummary: facets?.briefSummary,
+  };
+}
+
+function pickDominantModel(msgs: ParsedMessage[]): string {
+  const counts = new Map<string, number>();
+  for (const m of msgs) {
+    const model = m.model ?? 'claude-sonnet-4-6';
+    if (model === '<synthetic>') continue;
+    counts.set(model, (counts.get(model) ?? 0) + 1);
+  }
+  let best = 'claude-sonnet-4-6';
+  let max = 0;
+  for (const [model, n] of counts) {
+    if (n > max) { max = n; best = model; }
+  }
+  return best;
 }

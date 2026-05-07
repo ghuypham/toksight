@@ -36,6 +36,9 @@ export function loadSessionMeta(sessionId: string, rootOverride?: string): Sessi
         usesMcp: raw.uses_mcp ?? false,
         usesTaskAgent: raw.uses_task_agent ?? false,
         messageHours: raw.message_hours ?? [],
+        firstPrompt: typeof raw.first_prompt === 'string' && raw.first_prompt.length > 0
+          ? raw.first_prompt
+          : undefined,
       };
     }
   } catch {

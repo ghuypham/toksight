@@ -3,6 +3,8 @@ import type { RecentSession } from '../../src/types';
 
 interface RecentSessionsProps {
   sessions: RecentSession[];
+  /** Click handler — invoked with full session id (or truncated fallback). */
+  onSelect?: (sessionId: string) => void;
 }
 
 function fmtCost(n: number): string {
@@ -13,7 +15,7 @@ function fmtCost(n: number): string {
 }
 
 /** RECENT label + session list with project name, timeAgo, cost, active dot */
-export function RecentSessions({ sessions }: RecentSessionsProps) {
+export function RecentSessions({ sessions, onSelect }: RecentSessionsProps) {
   if (!sessions || sessions.length === 0) return null;
 
   return (
@@ -34,13 +36,21 @@ export function RecentSessions({ sessions }: RecentSessionsProps) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
         {sessions.map((s, idx) => {
           const isLast = idx === sessions.length - 1;
+          const targetId = s.fullSessionId ?? s.id;
           return (
             <div
               key={s.id}
               data-row={idx + 1}
+              onClick={onSelect ? () => onSelect(targetId) : undefined}
+              role={onSelect ? 'button' : undefined}
+              tabIndex={onSelect ? 0 : undefined}
+              onKeyDown={onSelect ? (e: KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(targetId); }
+              } : undefined}
               style={{
                 padding: isLast ? '8px 0 0' : '8px 0',
                 borderBottom: isLast ? 'none' : `1px solid ${theme.widgetBorder}`,
+                cursor: onSelect ? 'pointer' : 'default',
               }}
             >
               {/* Row 1: project name + timeAgo */}

@@ -11,10 +11,8 @@ dist/
 .superpowers/
 plans/
 docs/
-release-assets/
 scripts/
 CLAUDE.md
 AGENTS.md
 DESIGN.md
-RELEASE.md
-mockup-data.json
+RELEASE-PLAN.md

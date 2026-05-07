@@ -147,7 +147,8 @@ export function fmtResetsAt(resetsAt: string | null): string {
   if (!resetsAt) return '';
   const diffMs = new Date(resetsAt).getTime() - Date.now();
   if (diffMs <= 0) return 'now';
-  const totalMin = Math.floor(diffMs / 60_000);
+  // Round to nearest minute — floor caused off-by-one (24m for 25-min target when test runs a few ms late)
+  const totalMin = Math.round(diffMs / 60_000);
   const days = Math.floor(totalMin / 1440);
   const hours = Math.floor((totalMin % 1440) / 60);
   const mins  = totalMin % 60;

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'preact/hooks';
-import type { WebviewData, PrimaryUnit } from '../../src/types';
+import type { WebviewData, PrimaryUnit, SessionDetail } from '../../src/types';
 
 interface VsCodeApi {
   postMessage(message: unknown): void;
@@ -20,6 +20,9 @@ interface ExtensionState {
   data: WebviewData | null;
   settings: { carouselInterval: number; primaryUnit: PrimaryUnit };
   mode: 'sidebar' | 'editor';
+  /** Last `sessionDetail` payload from extension. `undefined` = never requested,
+   * `null` = request returned no match, `SessionDetail` = ready to render. */
+  sessionDetail: SessionDetail | null | undefined;
 }
 
 /** Hook to receive data from extension host via postMessage */
@@ -29,6 +32,7 @@ export function useExtensionData(): ExtensionState {
     { carouselInterval: 5000, primaryUnit: 'cost' },
   );
   const [mode, setMode] = useState<'sidebar' | 'editor'>('sidebar');
+  const [sessionDetail, setSessionDetail] = useState<SessionDetail | null | undefined>(undefined);
 
   useEffect(() => {
     const handler = (event: MessageEvent) => {
@@ -39,6 +43,8 @@ export function useExtensionData(): ExtensionState {
         setSettings(message.data);
       } else if (message.type === 'mode') {
         setMode(message.data as 'sidebar' | 'editor');
+      } else if (message.type === 'sessionDetail') {
+        setSessionDetail(message.data as SessionDetail | null);
       }
     };
 
@@ -50,7 +56,12 @@ export function useExtensionData(): ExtensionState {
     return () => window.removeEventListener('message', handler);
   }, []);
 
-  return { data, settings, mode };
+  return { data, settings, mode, sessionDetail };
+}
+
+/** Request drill-down detail for a session id. Response arrives via `sessionDetail`. */
+export function requestSessionDetail(sessionId: string): void {
+  getVsCodeApi().postMessage({ type: 'requestSession', payload: sessionId });
 }
 
 /** Send message back to extension host */
