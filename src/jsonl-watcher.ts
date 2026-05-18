@@ -145,6 +145,26 @@ export class JsonlWatcher extends EventEmitter {
     return active;
   }
 
+  /**
+   * Returns the session directory for a given sessionId if it has a subagents/ folder, or null.
+   * When projectSlug is provided, only checks that specific project dir (avoids cross-project leaks).
+   * Falls back to scanning all project dirs if no slug given.
+   */
+  getSubagentDir(sessionId: string, projectSlug?: string): string | null {
+    try {
+      const slugs = projectSlug ? [projectSlug] : fs.readdirSync(this.basePath);
+      for (const dir of slugs) {
+        const candidatePath = path.join(this.basePath, dir, sessionId, 'subagents');
+        if (fs.existsSync(candidatePath)) {
+          return path.join(this.basePath, dir, sessionId);
+        }
+      }
+    } catch {
+      // basePath unreadable
+    }
+    return null;
+  }
+
   /** Scan all JSONL files and parse them */
   private scanAndParse(): void {
     const files = this.findJsonlFiles();

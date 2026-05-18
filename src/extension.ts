@@ -35,6 +35,7 @@ import type {
   ExplorerData,
 } from './types';
 import { fetchUsageLimits } from './anthropic-usage-api';
+import { buildAgentTree } from './agent-tree-builder';
 
 let watcher: JsonlWatcher | undefined;
 let statusBar: StatusBarManager | undefined;
@@ -186,6 +187,26 @@ export function activate(context: vscode.ExtensionContext): void {
       ? buildActiveSessionDetail(messages, activeSessionId, activeProjectPath, activeMeta)
       : null;
 
+    // ---- Agent tree for active session (scoped to current workspace) ----
+    const workspaceSlug = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath
+      ? vscode.workspace.workspaceFolders[0].uri.fsPath.replace(/\//g, '-')
+      : undefined;
+    let agentSessionDir: string | null = null;
+    let agentSessionId: string | null = activeSessionId;
+    if (agentSessionId) {
+      agentSessionDir = watcher?.getSubagentDir(agentSessionId, workspaceSlug) ?? null;
+    }
+    if (!agentSessionDir) {
+      for (const s of agg.recentSessions) {
+        const sid = s.fullSessionId ?? s.id;
+        const dir = watcher?.getSubagentDir(sid, workspaceSlug);
+        if (dir) { agentSessionDir = dir; agentSessionId = sid; break; }
+      }
+    }
+    const agentTree = agentSessionDir
+      ? buildAgentTree(agentSessionDir, agentSessionId!)
+      : null;
+
     // ---- Today sessions timeline ----
     const todayISO = todayStart.toISOString().slice(0, 10);
     const todaySessionsList = buildTodaySessions(messages, todayISO);
@@ -315,6 +336,7 @@ export function activate(context: vscode.ExtensionContext): void {
           : 0,
         avgDurationMinutes: agg.avgSessionDurationMinutes,
       },
+      agentTree,
       summary: {
         totalToolCalls: agg.totalToolCalls,
         mcpCount: agg.mcp.length,

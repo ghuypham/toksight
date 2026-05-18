@@ -19,6 +19,7 @@ import { GroupContext } from './sidebar/group-context';
 import { GroupToday } from './sidebar/group-today';
 import { GroupQuota } from './sidebar/group-quota';
 import { GroupModelsTools } from './sidebar/group-models-tools';
+import { GroupAgentTree } from './sidebar/group-agent-tree';
 import { GroupInsights } from './sidebar/group-insights';
 import { FullPageApp } from './fullpage/full-page-app';
 
@@ -387,6 +388,7 @@ export function App() {
           <GroupToday data={data} onSelectSession={handleSelectSession} />
           <GroupQuota data={data} />
           <GroupModelsTools data={data} />
+          <GroupAgentTree agentTree={data.agentTree} />
           <GroupInsights data={data} />
 
           {/* ── Open Dashboard CTA ── */}

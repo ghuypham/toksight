@@ -192,6 +192,28 @@ export interface SessionStats {
   avgDurationMinutes: number;
 }
 
+/** Single agent node in the spawn hierarchy */
+export interface AgentTreeNode {
+  agentId: string;
+  agentType: string;
+  description: string;
+  model: string;
+  tokens: number;
+  cost: number;
+  messageCount: number;
+  /** ISO timestamp of last JSONL write — determines active vs completed */
+  lastActivityTime: string;
+  children: AgentTreeNode[];
+}
+
+/** Session-level agent tree */
+export interface SessionAgentTree {
+  sessionId: string;
+  agents: AgentTreeNode[];
+  totalAgentCost: number;
+  totalAgentTokens: number;
+}
+
 /** All computed metrics (used internally by metrics-calculator) */
 export interface MetricsData {
   outputRatio: number;
@@ -294,6 +316,8 @@ export interface WebviewData {
   cacheSavings: number;
   tokenBreakdown: TokenBreakdown;
   sessionStats: SessionStats;
+  /** Agent spawn tree for active/latest session with subagents */
+  agentTree: SessionAgentTree | null;
   summary: {
     totalToolCalls: number;
     mcpCount: number;

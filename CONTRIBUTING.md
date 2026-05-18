@@ -1,5 +1,7 @@
 # Contributing to TokSight
 
+Thanks for helping improve TokSight. By contributing you agree to follow our [Code of Conduct](CODE_OF_CONDUCT.md) — be respectful, be constructive.
+
 ## Setup
 
 ```bash
@@ -43,3 +45,7 @@ public/     Extension icon
 3. Make changes + add tests if applicable
 4. `npm run lint && npm test`
 5. Open a PR against `main`
+
+## Reporting Security Issues
+
+Please **do not** open public issues for security reports. See [SECURITY.md](SECURITY.md) for the private disclosure process.
