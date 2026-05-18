@@ -19,6 +19,7 @@ describe('readClaudeToken — macOS (darwin)', () => {
   });
 
   it('extracts accessToken from generic-password JSON payload', async () => {
+    if (process.platform !== 'darwin') return; // _testRunner only used on macOS path
     const runner = vi.fn().mockResolvedValue(VALID_JSON + '\n');
     const token = await readClaudeToken({ _testRunner: runner });
     expect(token).toBe('sk-ant-oat01-xyz');

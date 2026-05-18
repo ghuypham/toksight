@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TokSight — Sidebar</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #1e1e1e;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 40px 0 60px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  /* === Sidebar shell === */
+  .sidebar {
+    width: 280px;
+    background: #252526;
+    color: #e0ddd5;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 16px 48px rgba(0,0,0,0.55);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* === Panel title (VS Code injected) === */
+  .panel-title {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #8a8780;
+    padding: 8px 12px 4px;
+  }
+
+  /* === Extension header === */
+  .ext-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .bloom-icon {
+    width: 26px; height: 26px;
+    border-radius: 7px;
+    background: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.08);
+  }
+  .bloom-icon svg { width: 16px; height: 16px; }
+  .header-name {
+    font-size: 12px;
+    font-weight: 600;
+    flex: 1;
+    color: #e0ddd5;
+  }
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: #4CAF50;
+    font-weight: 500;
+  }
+  .live-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #4CAF50;
+  }
+  .expand-btn {
+    font-size: 11px;
+    color: #8a8780;
+    cursor: pointer;
+    margin-left: 6px;
+    background: none;
+    border: none;
+    padding: 0;
+    line-height: 1;
+  }
+  .expand-btn:hover { color: #e0ddd5; }
+
+  /* === Scrollable content === */
+  .sidebar-content {
+    overflow-y: auto;
+    padding: 6px 0 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* === Group block === */
+  .group {
+    padding: 8px 12px;
+  }
+  .group + .group {
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+
+  /* === Group label === */
+  .group-label {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #d97757;
+    padding-left: 7px;
+    border-left: 2px solid #d97757;
+    margin-bottom: 8px;
+  }
+
+  /* === Sub-label === */
+  .sub-label {
+    font-size: 9px;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: #8a8780;
+    margin-bottom: 5px;
+    margin-top: 10px;
+  }
+  .sub-label:first-child { margin-top: 0; }
+
+  /* === NOW group === */
+  .session-title {
+    font-family: 'SF Mono', 'JetBrains Mono', Consolas, monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: #e0ddd5;
+    margin-bottom: 4px;
+  }
+  .session-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 7px;
+  }
+  .session-meta-left {
+    font-size: 10px;
+    color: #8a8780;
+  }
+  .session-meta-right {
+    font-family: 'SF Mono', 'JetBrains Mono', Consolas, monospace;
+    font-size: 10px;
+    font-weight: 600;
+    color: #e0ddd5;
+  }
+
+  /* === Burn chart === */
+  .burn-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 24px;
+    margin-bottom: 5px;
+  }
+  .burn-chart .bar {
+    flex: 1;
+    border-radius: 1px 1px 0 0;
+    background: #3a3835;
+  }
+  .burn-chart .bar.peak { background: #d97757; }
+  .burn-label {
+    font-size: 9px;
+    color: #8a8780;
+  }
+
+  /* === CONTEXT group === */
+  .ctx-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+  .ctx-label { font-size: 10px; color: #8a8780; }
+  .ctx-pct { font-size: 10px; font-weight: 600; color: #34D399; }
+  .progress-track {
+    height: 3px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: #34D399;
+  }
+
+  /* === TODAY group === */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 4px;
+    margin-bottom: 9px;
+  }
+  .stat-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .stat-value {
+    font-size: 11px;
+    font-weight: 700;
+    color: #e0ddd5;
+  }
+  .stat-value.accent { color: #d97757; }
+  .stat-value.mono {
+    font-family: 'SF Mono', 'JetBrains Mono', Consolas, monospace;
+  }
+  .stat-key {
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #8a8780;
+  }
+
+  /* Session list */
+  .session-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .session-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0;
+    font-family: 'SF Mono', 'JetBrains Mono', Consolas, monospace;
+    font-size: 10px;
+    color: #8a8780;
+  }
+  .session-row-name {
+    color: #e0ddd5;
+    min-width: 72px;
+  }
+  .session-row-cost {
+    color: #e0ddd5;
+    font-weight: 600;
+  }
+  .session-row-meta {
+    color: #8a8780;
+    margin-left: 4px;
+  }
+
+  /* === QUOTA group === */
+  .quota-block {
+    margin-bottom: 7px;
+  }
+  .quota-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3px;
+  }
+  .quota-label-text { font-size: 10px; color: #8a8780; }
+  .quota-pct { font-size: 10px; font-weight: 600; color: #34D399; }
+  .quota-reset {
+    font-size: 9px;
+    color: #8a8780;
+    margin-top: 3px;
+  }
+  .cache-savings {
+    font-size: 10px;
+    color: #8a8780;
+    margin-top: 6px;
+  }
+  .cache-savings span {
+    color: #34D399;
+    font-family: 'SF Mono', 'JetBrains Mono', Consolas, monospace;
+  }
+
+  /* === MODELS & TOOLS group === */
+  .model-bar-track {
+    height: 5px;
+    border-radius: 3px;
+    overflow: hidden;
+    background: #3a3835;
+    display: flex;
+    margin-bottom: 7px;
+  }
+  .model-bar-seg { height: 100%; }
+
+  .model-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    color: #8a8780;
+    margin-bottom: 4px;
+  }
+  .model-row-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .model-row-name { color: #e0ddd5; flex: 1; }
+  .model-row-stats {
+    font-family: 'SF Mono', 'JetBrains Mono', Consolas, monospace;
+    font-size: 9px;
+    color: #8a8780;
+  }
+
+  .tool-row {
+    display: flex;
+    align-items: center;
+    font-size: 10px;
+    color: #8a8780;
+    margin-bottom: 3px;
+    gap: 0;
+  }
+  .tool-row-name { color: #e0ddd5; min-width: 48px; }
+  .tool-row-stats {
+    font-family: 'SF Mono', 'JetBrains Mono', Consolas, monospace;
+    font-size: 9px;
+    color: #8a8780;
+  }
+</style>
+</head>
+<body>
+<div class="sidebar">
+
+  <!-- Panel title -->
+  <div class="panel-title">TokSight</div>
+
+  <!-- Extension header -->
+  <div class="ext-header">
+    <div class="bloom-icon">
+      <!-- Bloom petals SVG -->
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="8" cy="4.5" r="2.2" fill="#e0ddd5" opacity="0.85"/>
+        <circle cx="11.5" cy="6.8" r="2.2" fill="#e0ddd5" opacity="0.75"/>
+        <circle cx="11.5" cy="10.5" r="2.2" fill="#e0ddd5" opacity="0.65"/>
+        <circle cx="8" cy="12.5" r="2.2" fill="#e0ddd5" opacity="0.75"/>
+        <circle cx="4.5" cy="10.5" r="2.2" fill="#e0ddd5" opacity="0.65"/>
+        <circle cx="4.5" cy="6.8" r="2.2" fill="#e0ddd5" opacity="0.75"/>
+        <circle cx="8" cy="8" r="2.4" fill="#e0ddd5"/>
+      </svg>
+    </div>
+    <span class="header-name">developer</span>
+    <div class="live-badge">
+      <span class="live-dot"></span>
+      <span>LIVE</span>
+    </div>
+    <button class="expand-btn">⛶</button>
+  </div>
+
+  <div class="sidebar-content">
+
+    <!-- NOW group -->
+    <div class="group">
+      <div class="group-label">Now</div>
+      <div class="session-title">my-app · Sonnet 4.5</div>
+      <div class="session-meta">
+        <span class="session-meta-left">12h · 94 tools</span>
+        <span class="session-meta-right">$47.3</span>
+      </div>
+      <div class="burn-chart">
+        <div class="bar" style="height:20%"></div>
+        <div class="bar" style="height:35%"></div>
+        <div class="bar" style="height:28%"></div>
+        <div class="bar" style="height:60%"></div>
+        <div class="bar" style="height:42%"></div>
+        <div class="bar" style="height:55%"></div>
+        <div class="bar" style="height:38%"></div>
+        <div class="bar" style="height:70%"></div>
+        <div class="bar" style="height:50%"></div>
+        <div class="bar" style="height:88%"></div>
+        <div class="bar" style="height:62%"></div>
+        <div class="bar" style="height:74%"></div>
+        <div class="bar" style="height:45%"></div>
+        <div class="bar" style="height:58%"></div>
+        <div class="bar peak" style="height:40%"></div>
+      </div>
+      <div class="burn-label">burn 15m &nbsp; peak $0.82/min · now $0.12/min · cooling</div>
+    </div>
+
+    <!-- CONTEXT group -->
+    <div class="group">
+      <div class="group-label">Context</div>
+      <div class="ctx-row">
+        <span class="ctx-label">218k / 1000k</span>
+        <span class="ctx-pct">22%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" style="width:22%"></div>
+      </div>
+    </div>
+
+    <!-- TODAY group -->
+    <div class="group">
+      <div class="group-label">Today</div>
+      <div class="stat-grid">
+        <div class="stat-cell">
+          <div class="stat-value">3</div>
+          <div class="stat-key">Sessions</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-value">2</div>
+          <div class="stat-key">Projects</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-value mono accent">$18.4</div>
+          <div class="stat-key">Spend</div>
+        </div>
+      </div>
+      <div class="session-list">
+        <div class="session-row">
+          <span class="session-row-name">my-app</span>
+          <span class="session-row-cost">$12.4</span>
+          <span class="session-row-meta"> · 12h · just now</span>
+        </div>
+        <div class="session-row">
+          <span class="session-row-name">api-server</span>
+          <span class="session-row-cost">$38.7</span>
+          <span class="session-row-meta"> · 28h 14m · 2h ago</span>
+        </div>
+        <div class="session-row">
+          <span class="session-row-name">api-server</span>
+          <span class="session-row-cost">$9.2</span>
+          <span class="session-row-meta"> · 8h 33m · 3d ago</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUOTA group -->
+    <div class="group">
+      <div class="group-label">Quota</div>
+
+      <div class="quota-block">
+        <div class="quota-header">
+          <span class="quota-label-text">5h window</span>
+          <span class="quota-pct">8%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width:8%"></div>
+        </div>
+        <div class="quota-reset">resets in 1h 52m</div>
+      </div>
+
+      <div class="quota-block">
+        <div class="quota-header">
+          <span class="quota-label-text">Weekly · all</span>
+          <span class="quota-pct">21%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width:21%"></div>
+        </div>
+      </div>
+
+      <div class="quota-block">
+        <div class="quota-header">
+          <span class="quota-label-text">Weekly · Sonnet</span>
+          <span class="quota-pct">4%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width:4%"></div>
+        </div>
+      </div>
+
+      <div class="cache-savings">Cache savings this week: <span>$1.8k</span></div>
+    </div>
+
+    <!-- MODELS & TOOLS group -->
+    <div class="group">
+      <div class="group-label">Models &amp; Tools</div>
+
+      <div class="sub-label">Model Mix</div>
+      <div class="model-bar-track">
+        <div class="model-bar-seg" style="width:94%; background:#d97757;"></div>
+        <div class="model-bar-seg" style="width:6%; background:#5b8dee;"></div>
+      </div>
+      <div class="model-row">
+        <div class="model-row-dot" style="background:#d97757;"></div>
+        <span class="model-row-name">Sonnet 4.5</span>
+        <span class="model-row-stats">$218.4 · 94%</span>
+      </div>
+      <div class="model-row">
+        <div class="model-row-dot" style="background:#5b8dee;"></div>
+        <span class="model-row-name">Haiku 3.5</span>
+        <span class="model-row-stats">$13.7 · 6%</span>
+      </div>
+
+      <div class="sub-label">Top Tools</div>
+      <div class="tool-row">
+        <span class="tool-row-name">Bash</span>
+        <span class="tool-row-stats">2841 · 518340k tok</span>
+      </div>
+      <div class="tool-row">
+        <span class="tool-row-name">Edit</span>
+        <span class="tool-row-stats">1923 · 312450k tok</span>
+      </div>
+      <div class="tool-row">
+        <span class="tool-row-name">Read</span>
+        <span class="tool-row-stats">2104 · 287610k tok</span>
+      </div>
+      <div class="tool-row">
+        <span class="tool-row-name">Grep</span>
+        <span class="tool-row-stats">714 · 98230k tok</span>
+      </div>
+    </div>
+
+  </div><!-- /sidebar-content -->
+</div>
+</body>
+</html>

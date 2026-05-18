@@ -6,8 +6,7 @@
 
 **Real-time Claude Code usage metrics — in your VS Code sidebar and terminal.**
 
-[![Open VSX](https://img.shields.io/open-vsx/v/ghuypham/toksight?label=Open%20VSX&color=822be2)](https://open-vsx.org/extension/ghuypham/toksight)
-[![npm](https://img.shields.io/npm/v/toksight?color=cb3837)](https://www.npmjs.com/package/toksight)
+[![CI](https://github.com/ghuypham/toksight/actions/workflows/ci.yml/badge.svg)](https://github.com/ghuypham/toksight/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
 

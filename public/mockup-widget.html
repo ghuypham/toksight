@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TokSight — Explorer Widget</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #1e1e1e;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 40px 0 60px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  /* === Widget card === */
+  .widget {
+    width: 280px;
+    background: #252526;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 12px 40px rgba(0,0,0,0.5);
+    padding: 10px 12px 10px;
+    color: #e0ddd5;
+  }
+
+  /* === Header row === */
+  .widget-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .slide-counter {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    color: #e0ddd5;
+  }
+  .live-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #4CAF50;
+    flex-shrink: 0;
+  }
+  .slide-num {
+    font-size: 10px;
+    color: #8a8780;
+  }
+  .model-badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    color: #e0ddd5;
+  }
+  .model-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #e879a0;
+    flex-shrink: 0;
+  }
+
+  /* === Group label === */
+  .group-label {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #d97757;
+    padding-left: 8px;
+    border-left: 2px solid #d97757;
+    margin-bottom: 9px;
+  }
+
+  /* === Quota rows === */
+  .quota-row {
+    margin-bottom: 7px;
+  }
+  .quota-row-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 3px;
+  }
+  .quota-label {
+    font-size: 10px;
+    color: #8a8780;
+  }
+  .quota-pct {
+    font-size: 10px;
+    font-weight: 600;
+    color: #34D399;
+  }
+  .progress-track {
+    height: 3px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: #34D399;
+  }
+
+  /* === Footer === */
+  .widget-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    margin-bottom: 7px;
+  }
+  .footer-left {
+    font-size: 9px;
+    color: #8a8780;
+  }
+  .footer-right {
+    font-family: 'SF Mono', 'JetBrains Mono', Consolas, monospace;
+    font-size: 10px;
+    color: #e0ddd5;
+  }
+
+  /* === Bar chart === */
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 28px;
+    margin-bottom: 8px;
+  }
+  .bar-chart .bar {
+    flex: 1;
+    border-radius: 2px 2px 0 0;
+    background: #3a3835;
+  }
+  .bar-chart .bar.peak {
+    background: #d97757;
+  }
+
+  /* === Slide indicators + pin === */
+  .widget-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .slide-dots {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+  .dot-ind {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+  }
+  .dot-ind.active { background: #4CAF50; }
+  .dot-ind.inactive { background: #4a4845; }
+  .pin-btn-removed {
+    font-size: 9px;
+    color: #8a8780;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .pin-btn:hover { color: #e0ddd5; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <!-- Header -->
+  <div class="widget-header">
+    <div class="slide-counter">
+      <span class="live-dot"></span>
+      <span class="slide-num">1 / 2</span>
+    </div>
+    <div class="model-badge">
+      <span class="model-dot"></span>
+      <span>Sonnet 4.5</span>
+    </div>
+  </div>
+
+  <!-- Group label -->
+  <div class="group-label">Quota</div>
+
+  <!-- 5h window row -->
+  <div class="quota-row">
+    <div class="quota-row-top">
+      <span class="quota-label">5h window · resets 1h 52m</span>
+      <span class="quota-pct">8%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" style="width: 8%;"></div>
+    </div>
+  </div>
+
+  <!-- Weekly all row -->
+  <div class="quota-row">
+    <div class="quota-row-top">
+      <span class="quota-label">Weekly · all</span>
+      <span class="quota-pct">21%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" style="width: 21%;"></div>
+    </div>
+  </div>
+
+  <!-- Weekly Sonnet row -->
+  <div class="quota-row">
+    <div class="quota-row-top">
+      <span class="quota-label">Weekly · Sonnet</span>
+      <span class="quota-pct">4%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" style="width: 4%;"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="widget-footer">
+    <span class="footer-left">Last 7 days · avg $41</span>
+    <span class="footer-right">today $18</span>
+  </div>
+
+  <!-- Bar chart (7 bars) -->
+  <div class="bar-chart">
+    <div class="bar" style="height: 30%;"></div>
+    <div class="bar" style="height: 55%;"></div>
+    <div class="bar" style="height: 40%;"></div>
+    <div class="bar" style="height: 65%;"></div>
+    <div class="bar" style="height: 45%;"></div>
+    <div class="bar" style="height: 80%;"></div>
+    <div class="bar peak" style="height: 50%;"></div>
+  </div>
+
+  <!-- Slide indicators + pin -->
+  <div class="widget-bottom">
+    <div class="slide-dots">
+      <div class="dot-ind active"></div>
+      <div class="dot-ind inactive"></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

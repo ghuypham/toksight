@@ -6,6 +6,7 @@
 .gitnexus/        export-ignore
 .superpowers/     export-ignore
 docs/             export-ignore
+plans/            export-ignore
 scripts/          export-ignore
 
 RELEASE-PLAN.md   export-ignore

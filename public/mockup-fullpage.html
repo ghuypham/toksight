@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TokSight — Full-Page Dashboard</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #1e1e1e;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 40px 0 60px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  /* === Dashboard shell === */
+  .dashboard {
+    width: 960px;
+    background: #1a1a1a;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 24px 72px rgba(0,0,0,0.65);
+    color: #e0ddd5;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* === Top header === */
+  .dash-header {
+    background: #252526;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .bloom-icon {
+    width: 26px; height: 26px;
+    border-radius: 7px;
+    background: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.08);
+  }
+  .bloom-icon svg { width: 16px; height: 16px; }
+  .header-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #e0ddd5;
+    flex: 1;
+  }
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: #4CAF50;
+    font-weight: 500;
+  }
+  .live-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #4CAF50;
+  }
+  .expand-btn {
+    font-size: 12px;
+    color: #8a8780;
+    cursor: pointer;
+    margin-left: 8px;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  /* === Sub-header === */
+  .dash-subheader {
+    background: #252526;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 6px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .subheader-title {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 13px;
+    color: #e0ddd5;
+    letter-spacing: 0.02em;
+  }
+  .subheader-title span { color: #d97757; }
+  .date-dropdown {
+    font-size: 11px;
+    color: #8a8780;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    padding: 3px 8px;
+  }
+
+  /* === Body: left nav + main === */
+  .dash-body {
+    display: flex;
+    flex: 1;
+    min-height: 600px;
+  }
+
+  /* === Left nav === */
+  .left-nav {
+    width: 180px;
+    background: #252526;
+    border-right: 1px solid rgba(255,255,255,0.05);
+    padding: 12px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 16px;
+    font-size: 11px;
+    color: #8a8780;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: color 0.15s;
+  }
+  .nav-item:hover { color: #e0ddd5; background: rgba(255,255,255,0.03); }
+  .nav-item.active {
+    color: #d97757;
+    border-left-color: #d97757;
+    background: rgba(217,119,87,0.08);
+  }
+  .nav-icon { font-size: 12px; width: 14px; text-align: center; }
+
+  /* === Main content === */
+  .dash-main {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  /* === Stat cards grid === */
+  .stat-cards {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 10px;
+  }
+  .stat-card {
+    background: #2a2822;
+    border-radius: 8px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.06);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .card-label {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #8a8780;
+  }
+  .card-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #e0ddd5;
+    line-height: 1;
+  }
+  .card-value.green { color: #34D399; }
+  .card-value.mono {
+    font-family: 'SF Mono', 'JetBrains Mono', Consolas, monospace;
+    font-size: 22px;
+  }
+  .card-sub {
+    font-size: 10px;
+    color: #8a8780;
+  }
+  .card-sub.green { color: #34D399; }
+  .card-progress {
+    height: 4px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 2px;
+  }
+  .card-progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: #34D399;
+  }
+  .card-reset {
+    font-size: 9px;
+    color: #8a8780;
+    margin-top: 2px;
+  }
+
+  /* === Section heading === */
+  .section-heading {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #8a8780;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    margin-bottom: 2px;
+  }
+
+  /* === Two-column layout === */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 14px;
+    align-items: start;
+  }
+
+  /* === Quota rows === */
+  .quota-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .quota-row {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .quota-row-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .quota-row-label { font-size: 11px; color: #8a8780; }
+  .quota-row-pct { font-size: 11px; font-weight: 600; color: #34D399; }
+  .quota-row-sub { font-size: 9px; color: #8a8780; margin-top: 1px; }
+  .progress-track {
+    height: 4px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: #34D399;
+  }
+
+  /* === Forecast card === */
+  .forecast-card {
+    background: #2a2822;
+    border-radius: 8px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.06);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .forecast-card .card-label { margin-bottom: 2px; }
+  .forecast-empty {
+    font-size: 11px;
+    color: #8a8780;
+    font-style: italic;
+  }
+  .forecast-row {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .forecast-row-label { font-size: 9px; color: #8a8780; text-transform: uppercase; letter-spacing: 0.08em; }
+  .forecast-row-value {
+    font-size: 12px;
+    color: #e0ddd5;
+    font-family: 'SF Mono', 'JetBrains Mono', Consolas, monospace;
+  }
+  .forecast-row-sub { font-size: 9px; color: #8a8780; }
+
+  /* === 7-day bar chart section === */
+  .spend-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .spend-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .spend-max-label {
+    font-size: 9px;
+    color: #8a8780;
+    font-family: 'SF Mono', 'JetBrains Mono', Consolas, monospace;
+  }
+  .bar-chart-7 {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 72px;
+  }
+  .bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+  }
+  .bar-col .bar {
+    width: 100%;
+    border-radius: 3px 3px 0 0;
+    background: #3a3835;
+    margin-top: auto;
+  }
+  .bar-col .bar.accent { background: #d97757; }
+  .bar-day {
+    font-size: 8px;
+    color: #8a8780;
+    text-align: center;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+<div class="dashboard">
+
+  <!-- Top header -->
+  <div class="dash-header">
+    <div class="bloom-icon">
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="8" cy="4.5" r="2.2" fill="#e0ddd5" opacity="0.85"/>
+        <circle cx="11.5" cy="6.8" r="2.2" fill="#e0ddd5" opacity="0.75"/>
+        <circle cx="11.5" cy="10.5" r="2.2" fill="#e0ddd5" opacity="0.65"/>
+        <circle cx="8" cy="12.5" r="2.2" fill="#e0ddd5" opacity="0.75"/>
+        <circle cx="4.5" cy="10.5" r="2.2" fill="#e0ddd5" opacity="0.65"/>
+        <circle cx="4.5" cy="6.8" r="2.2" fill="#e0ddd5" opacity="0.75"/>
+        <circle cx="8" cy="8" r="2.4" fill="#e0ddd5"/>
+      </svg>
+    </div>
+    <span class="header-name">developer</span>
+    <div class="live-badge">
+      <span class="live-dot"></span>
+      <span>LIVE</span>
+    </div>
+    <button class="expand-btn">⛶</button>
+  </div>
+
+  <!-- Sub-header -->
+  <div class="dash-subheader">
+    <div class="subheader-title">TokSight · <span>Quota</span></div>
+    <div class="date-dropdown">Last 7 days ▾</div>
+  </div>
+
+  <!-- Body -->
+  <div class="dash-body">
+
+    <!-- Left nav -->
+    <nav class="left-nav">
+      <div class="nav-item active">
+        <span class="nav-icon">◈</span>
+        <span>Quota</span>
+      </div>
+      <div class="nav-item">
+        <span class="nav-icon">◷</span>
+        <span>Sessions</span>
+      </div>
+      <div class="nav-item">
+        <span class="nav-icon">◫</span>
+        <span>Projects</span>
+      </div>
+      <div class="nav-item">
+        <span class="nav-icon">◑</span>
+        <span>Models &amp; Tools</span>
+      </div>
+      <div class="nav-item">
+        <span class="nav-icon">◆</span>
+        <span>Insights</span>
+      </div>
+    </nav>
+
+    <!-- Main content -->
+    <main class="dash-main">
+
+      <!-- Stat cards -->
+      <div class="stat-cards">
+
+        <!-- Hero: Week all models -->
+        <div class="stat-card">
+          <div class="card-label">Week · All Models</div>
+          <div class="card-value green">21%</div>
+          <div class="card-progress">
+            <div class="card-progress-fill" style="width:21%"></div>
+          </div>
+          <div class="card-reset">resets in 3d 14h</div>
+        </div>
+
+        <!-- Today spend -->
+        <div class="stat-card">
+          <div class="card-label">Today Spend</div>
+          <div class="card-value mono">$18.42</div>
+          <div class="card-sub">+142% vs yesterday</div>
+        </div>
+
+        <!-- Cache saved -->
+        <div class="stat-card">
+          <div class="card-label">Cache Saved · 7d</div>
+          <div class="card-value mono green">$1,831</div>
+          <div class="card-sub green">97% hit rate</div>
+        </div>
+
+        <!-- Total spend -->
+        <div class="stat-card">
+          <div class="card-label">Total Spend · 7d</div>
+          <div class="card-value mono">$232.10</div>
+        </div>
+
+      </div>
+
+      <!-- Current quota + forecast -->
+      <div>
+        <div class="section-heading">Current Quota</div>
+        <div class="two-col" style="margin-top:12px;">
+
+          <div class="quota-section">
+            <div class="quota-row">
+              <div class="quota-row-top">
+                <span class="quota-row-label">5h window</span>
+                <span class="quota-row-pct">8%</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width:8%"></div>
+              </div>
+              <div class="quota-row-sub">resets in 1h 52m</div>
+            </div>
+
+            <div class="quota-row">
+              <div class="quota-row-top">
+                <span class="quota-row-label">Weekly · all models</span>
+                <span class="quota-row-pct">21%</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width:21%"></div>
+              </div>
+              <div class="quota-row-sub">resets in 3d 14h</div>
+            </div>
+
+            <div class="quota-row">
+              <div class="quota-row-top">
+                <span class="quota-row-label">Weekly · Sonnet only</span>
+                <span class="quota-row-pct">4%</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width:4%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Forecast card -->
+          <div class="forecast-card">
+            <div class="card-label">Forecast &amp; Burn</div>
+            <div class="forecast-empty">No active session</div>
+            <div class="forecast-row">
+              <div class="forecast-row-label">Peak today</div>
+              <div class="forecast-row-value">$0.820/min</div>
+              <div class="forecast-row-sub">32m ago</div>
+            </div>
+            <div class="forecast-row">
+              <div class="forecast-row-label">ETA weekly cap</div>
+              <div class="forecast-row-value" style="font-family:inherit; font-size:11px; color:#8a8780;">resets in 3d 14h</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 7-day spend chart -->
+      <div class="spend-section">
+        <div class="spend-header">
+          <div class="section-heading" style="border:none; margin:0; padding:0;">7-Day Spend</div>
+          <div class="spend-max-label">max $89.40</div>
+        </div>
+        <div class="bar-chart-7">
+          <div class="bar-col">
+            <div class="bar" style="height:18%"></div>
+            <div class="bar-day">Mon</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar" style="height:34%"></div>
+            <div class="bar-day">Tue</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar" style="height:22%"></div>
+            <div class="bar-day">Wed</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar" style="height:48%"></div>
+            <div class="bar-day">Thu</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar" style="height:61%"></div>
+            <div class="bar-day">Fri</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar accent" style="height:100%"></div>
+            <div class="bar-day">Sat</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar accent" style="height:21%"></div>
+            <div class="bar-day">Sun</div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div><!-- /dash-body -->
+</div>
+</body>
+</html>
