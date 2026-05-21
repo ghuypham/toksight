@@ -1,343 +1,16 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light"><head>
+<html lang="en" data-theme="dark"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TokSight — Real-time Claude Code usage, right in your IDE</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<style>/* cyrillic */
-@font-face {
-  font-family: 'Geist';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url("__ASSET_ffbfae77_font/woff2__") format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'Geist';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url("__ASSET_e2ede034_font/woff2__") format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Geist';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url("__ASSET_0d9f4093_font/woff2__") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* cyrillic */
-@font-face {
-  font-family: 'Geist';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("__ASSET_ffbfae77_font/woff2__") format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'Geist';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("__ASSET_e2ede034_font/woff2__") format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Geist';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("__ASSET_0d9f4093_font/woff2__") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* cyrillic */
-@font-face {
-  font-family: 'Geist';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url("__ASSET_ffbfae77_font/woff2__") format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'Geist';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url("__ASSET_e2ede034_font/woff2__") format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Geist';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url("__ASSET_0d9f4093_font/woff2__") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* cyrillic */
-@font-face {
-  font-family: 'Geist';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("__ASSET_ffbfae77_font/woff2__") format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'Geist';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("__ASSET_e2ede034_font/woff2__") format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Geist';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("__ASSET_0d9f4093_font/woff2__") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* cyrillic */
-@font-face {
-  font-family: 'Geist';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url("__ASSET_ffbfae77_font/woff2__") format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'Geist';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url("__ASSET_e2ede034_font/woff2__") format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Geist';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url("__ASSET_0d9f4093_font/woff2__") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'Instrument Serif';
-  font-style: italic;
-  font-weight: 400;
-  font-display: swap;
-  src: url("__ASSET_06da2b7f_font/woff2__") format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Instrument Serif';
-  font-style: italic;
-  font-weight: 400;
-  font-display: swap;
-  src: url("__ASSET_bd28b8e6_font/woff2__") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'Instrument Serif';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("__ASSET_e0c3f5c2_font/woff2__") format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Instrument Serif';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("__ASSET_ba93baba_font/woff2__") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* cyrillic-ext */
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("__ASSET_bfa871a5_font/woff2__") format('woff2');
-  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
-}
-/* cyrillic */
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("__ASSET_64d63a64_font/woff2__") format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-/* greek */
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("__ASSET_7a9ed7dc_font/woff2__") format('woff2');
-  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
-}
-/* vietnamese */
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("__ASSET_498e7413_font/woff2__") format('woff2');
-  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("__ASSET_ea297616_font/woff2__") format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("__ASSET_8099f7ca_font/woff2__") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* cyrillic-ext */
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url("__ASSET_bfa871a5_font/woff2__") format('woff2');
-  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
-}
-/* cyrillic */
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url("__ASSET_64d63a64_font/woff2__") format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-/* greek */
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url("__ASSET_7a9ed7dc_font/woff2__") format('woff2');
-  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
-}
-/* vietnamese */
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url("__ASSET_498e7413_font/woff2__") format('woff2');
-  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url("__ASSET_ea297616_font/woff2__") format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url("__ASSET_8099f7ca_font/woff2__") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* cyrillic-ext */
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("__ASSET_bfa871a5_font/woff2__") format('woff2');
-  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
-}
-/* cyrillic */
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("__ASSET_64d63a64_font/woff2__") format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-/* greek */
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("__ASSET_7a9ed7dc_font/woff2__") format('woff2');
-  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
-}
-/* vietnamese */
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("__ASSET_498e7413_font/woff2__") format('woff2');
-  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("__ASSET_ea297616_font/woff2__") format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("__ASSET_8099f7ca_font/woff2__") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.cdnfonts.com/css/geist" rel="stylesheet">
+<style>
+/* Font fallback — Geist via CDN, Instrument Serif + JetBrains Mono via Google Fonts.
+   Original @font-face blocks with __ASSET_* placeholders removed (build artifact residue). */
+/*FONTS-LOADED-VIA-LINK-TAGS*/
 </style>
 
 
@@ -1282,15 +955,83 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   .insight .it { font-size: 14px; font-weight: 500; }
   .insight .id { font-size: 12.5px; color: var(--ink-3); margin-top: 2px; }
 
+  /* ─── Product showcase tabs ─── */
+  #product-showcase { padding: 96px 0 60px; }
+  #product-showcase .section-sub { max-width: 640px; margin: 0 auto; text-align: center; }
+  #product-showcase > .wrap > .reveal { text-align: center; }
+  #product-showcase > .wrap > .reveal .eyebrow { justify-content: center; }
+  .showcase-tabs {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin: 32px 0 24px;
+  }
+  .showcase-tab {
+    padding: 10px 24px;
+    border: 1px solid var(--rule);
+    background: transparent;
+    color: var(--ink-2);
+    font-family: 'Geist', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .showcase-tab:hover {
+    color: var(--ink);
+    border-color: var(--ink-3);
+  }
+  .showcase-tab.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+  .showcase-pane { display: none; }
+  .showcase-pane.active { display: block; }
+  .widget-sidebar-row {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+  /* Widget pane layout */
+  .widget-pane-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 0;
+  }
+  .widget-pane-frame {
+    background: var(--bg-2);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    overflow: hidden;
+    min-width: 240px;
+    max-width: 280px;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-md);
+  }
+  .widget-pane-desc {
+    max-width: 340px;
+    padding-top: 12px;
+  }
+  .widget-pane-desc h4 { margin: 0 0 10px; font-size: 17px; font-weight: 600; }
+  .widget-pane-desc p { margin: 0; color: var(--ink-2); font-size: 15px; line-height: 1.6; }
+
   /* ─── Dashboard tabs section ─── */
   .dash-section { padding-top: 40px; }
   .dash-frame {
-    margin-top: 48px;
+    margin-top: 32px;
     background: var(--card);
     border: 1px solid var(--rule);
     border-radius: 14px;
     overflow: hidden;
     box-shadow: var(--shadow-lg);
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+    max-height: 600px;
+    overflow-y: auto;
   }
   .dash-topbar {
     display: flex; align-items: center;
@@ -1801,6 +1542,41 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
     .activity-bar, .side { display: none; }
     h1.hero-title { font-size: 44px; }
   }
+  .hero-bullets {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .hero-bullets li {
+    font-size: 14px;
+    color: var(--ink-2);
+    padding-left: 18px;
+    position: relative;
+  }
+  .hero-bullets li::before {
+    content: "—";
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+    .reveal { opacity: 1; transform: none; }
+  }
+  .btn-primary:focus-visible,
+  .btn-secondary:focus-visible,
+  .install-btn:focus-visible,
+  .fp-nav-item:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
 </style>
 </head>
 <body>
@@ -1834,16 +1610,15 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
       <span>TokSight</span>
     </div>
     <div class="nav-links">
-      <a href="#sidebar-showcase">Sidebar</a>
+      <a href="#product-showcase">Preview</a>
       <a href="#features">Features</a>
-      <a href="#dashboard">Dashboard</a>
       <a href="#faq">FAQ</a>
     </div>
     <div class="nav-right">
       <button class="theme-btn" id="themeBtn" title="Toggle theme" aria-label="Toggle theme">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
       </button>
-      <a class="install-btn" href="https://marketplace.visualstudio.com/items?itemName=toksight.toksight">Install →</a>
+      <a class="install-btn" href="https://marketplace.visualstudio.com/items?itemName=ghuypham.toksight">Install →</a>
     </div>
   </div>
 </nav>
@@ -1859,15 +1634,19 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
       </div>
       <h1 class="hero-title">Every token your <em>Claude Code</em> spends, in your IDE.</h1>
       <p class="hero-sub">
-        TokSight reads your local <span class="mono">~/.claude/projects/*.jsonl</span> and shows you exactly where your budget goes —
-        live context %, burn rate, 5h &amp; 7d quota windows, model mix, per-session recaps — without ever leaving the editor.
+        See exactly where your Claude Code budget goes — live, inside your editor.
       </p>
+      <ul class="hero-bullets">
+        <li>Live burn rate and context window tracking</li>
+        <li>5-hour and 7-day quota monitoring with forecasts</li>
+        <li>Per-session cost breakdown and model mix</li>
+      </ul>
       <div class="hero-cta-row">
-        <a class="btn-primary" href="https://marketplace.visualstudio.com/items?itemName=toksight.toksight">
+        <a class="btn-primary" href="https://marketplace.visualstudio.com/items?itemName=ghuypham.toksight">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Install on VS Code Marketplace
         </a>
-        <a class="btn-secondary" href="https://github.com/toksight/toksight" style="display:inline-flex;align-items:center;gap:8px;">
+        <a class="btn-secondary" href="https://github.com/ghuypham/toksight" style="display:inline-flex;align-items:center;gap:8px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2.01c-3.2.69-3.88-1.54-3.88-1.54-.52-1.33-1.28-1.68-1.28-1.68-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.74.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.19-3.09-.12-.29-.52-1.47.11-3.06 0 0 .97-.31 3.18 1.18.92-.26 1.91-.39 2.89-.39s1.97.13 2.89.39c2.21-1.49 3.18-1.18 3.18-1.18.63 1.59.23 2.77.11 3.06.74.81 1.19 1.84 1.19 3.09 0 4.41-2.69 5.39-5.25 5.67.41.36.77 1.06.77 2.14v3.17c0 .31.21.67.8.56C20.21 21.39 23.5 17.08 23.5 12c0-6.35-5.15-11.5-11.5-11.5Z"/></svg>
           GitHub
         </a>
@@ -2070,102 +1849,7 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
           </div>
         </div>
 
-        <!-- Explorer widget panel -->
-        <div class="panel">
-          <div class="panel-tabs">
-            <div class="t active">Explorer · TokSight</div>
-            <div class="t">Problems</div>
-            <div class="t">Terminal</div>
-          </div>
-          <div class="panel-body">
-            <div class="widget" id="heroWidget">
-
-              <!-- Slide 1 · QUOTA (matches webview/explorer/slide-quota.tsx) -->
-              <div class="wslide active" data-w="0">
-                <div class="w-eyebrow">QUOTA</div>
-
-                <div class="q-row">
-                  <div class="q-lbl">5h window <span class="q-meta">· resets 2h 18m</span></div>
-                  <div class="q-pct warn">42%</div>
-                </div>
-                <div class="q-bar"><i style="width:42%"></i></div>
-
-                <div class="q-row"><div class="q-lbl">Weekly · all</div><div class="q-pct">71%</div></div>
-                <div class="q-bar"><i style="width:71%" class="warn"></i></div>
-
-                <div class="q-row"><div class="q-lbl">Weekly · Sonnet</div><div class="q-pct">68%</div></div>
-                <div class="q-bar"><i style="width:68%"></i></div>
-
-                <div class="q-forecast">
-                  <span class="q-fi">⏱</span>
-                  <span>hit limit in <b>~2h 18m</b> at $0.21/min</span>
-                </div>
-
-                <div class="q-spark-head">
-                  <span>Last 7 days</span>
-                  <span>today <b>$14.62</b></span>
-                </div>
-                <div class="q-spark" data-spark="0"></div>
-              </div>
-
-              <!-- Slide 2 · SESSION NOW (matches webview/explorer/slide-session-now.tsx) -->
-              <div class="wslide" data-w="1">
-                <div class="s-head">
-                  <span class="s-title">acme-api <span class="s-model">· sonnet-4.5</span></span>
-                  <span class="s-dur">22m</span>
-                </div>
-
-                <div class="s-ctx-row">
-                  <span class="s-ctx-lbl">Context · 114k / 200k</span>
-                  <span class="s-ctx-pct">57%</span>
-                </div>
-                <div class="s-ctx-bar"><i style="width:57%"></i></div>
-
-                <div class="s-cells">
-                  <div><div class="s-ck">SPENT</div><div class="s-cv coral">$4.18</div></div>
-                  <div><div class="s-ck">BURN</div><div class="s-cv">$0.21/m</div></div>
-                  <div><div class="s-ck">SAVED</div><div class="s-cv good">$6.18</div></div>
-                </div>
-
-                <div class="s-today-head">TODAY</div>
-                <div class="s-stack">
-                  <i style="width:82%;background:var(--accent)" title="sonnet-4.5 · 82%"></i>
-                  <i style="width:14%;background:color-mix(in oklab, var(--accent) 60%, var(--model-mix))" title="opus-4.5 · 14%"></i>
-                  <i style="width:4%;background:var(--ink-3)" title="haiku-4.5 · 4%"></i>
-                </div>
-                <div class="s-model-row">
-                  <span><i class="dot" style="background:var(--accent)"></i>sonnet-4.5</span>
-                  <span class="s-model-v">$62.80 · 82%</span>
-                </div>
-                <div class="s-model-row">
-                  <span><i class="dot" style="background:color-mix(in oklab, var(--accent) 60%, var(--model-mix))"></i>opus-4.5</span>
-                  <span class="s-model-v">$18.94 · 14%</span>
-                </div>
-                <div class="s-model-row">
-                  <span><i class="dot" style="background:var(--ink-3)"></i>haiku-4.5</span>
-                  <span class="s-model-v">$0.82 · 4%</span>
-                </div>
-              </div>
-
-              <!-- Slide 3 · LAST RECAP (matches webview/explorer/slide-recap.tsx) -->
-              <div class="wslide" data-w="2">
-                <div class="r-head">
-                  <span class="r-title">Last session</span>
-                  <span class="r-time">18m ago</span>
-                </div>
-
-                <div class="r-quote">&ldquo;Swapped callback-based JWT check for async verify; added refresh-token rotation across both gateways.&rdquo;</div>
-
-                <div class="r-kv"><span class="r-k">outcome</span><span class="r-v good">fully_achieved</span></div>
-                <div class="r-kv"><span class="r-k">helpful</span><span class="r-v good">very_helpful</span></div>
-
-                <div class="r-meta"><span class="r-add">+214</span> / <span class="r-del">-88</span> lines · 2 commits · 7 files</div>
-                <div class="r-friction">friction: timeout ×2 · permission_denied ×1</div>
-              </div>
-
-            </div>
-          </div>
-        </div>
+        <!-- Widget panel removed — see #product-showcase below -->
 
         <div class="statusbar">
           <span>⎇ main</span>
@@ -2181,122 +1865,709 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   </div>
 </header>
 
-<!-- ─── SIDEBAR SHOWCASE ─── -->
-<section id="sidebar-showcase">
+<!-- ─── PRODUCT SHOWCASE ─── -->
+<section id="product-showcase">
   <div class="wrap">
-    <div class="reveal ss-intro">
-      <div class="eyebrow">The activity-bar view</div>
-      <h2 class="section-title">Your whole Claude day, <em>one sidebar away.</em></h2>
-      <p class="section-sub">
-        Pinned to your IDE's sidebar. Five collapsible groups, rendered from your local JSONL —
-        click through from live session down to weekly trends. Everything you see below is live data.
-      </p>
+    <div class="reveal">
+      <div class="eyebrow">See it in action</div>
+      <h2 class="section-title">Three surfaces, <em>one tool.</em></h2>
+      <p class="section-sub">Widget for quick glances. Sidebar for deep context. Dashboard for the full picture.</p>
     </div>
 
-    <div class="ss-grid reveal">
-      <!-- Sidebar mock -->
-      <div class="ss-sidebar">
-        <div class="ss-side-head">
-          <span class="ss-dot"></span>
-          <span class="ss-title">TOKSIGHT</span>
-          <span class="ss-user mono">@huypg</span>
-        </div>
+    <!-- Tab switcher -->
+    <div class="showcase-tabs reveal">
+      <button class="showcase-tab active" data-showcase="sidebar">Sidebar</button>
+      <button class="showcase-tab" data-showcase="widget">Widget</button>
+      <button class="showcase-tab" data-showcase="dashboard">Dashboard</button>
+    </div>
 
-        <div class="ss-group" data-g="now">
-          <div class="ss-gh"><span>NOW</span><span class="caret">▾</span></div>
-          <div class="ss-gb">
-            <div class="ss-row"><span class="k">Project</span><span class="v">acme-api</span></div>
-            <div class="ss-row"><span class="k">Model</span><span class="v pill">sonnet-4.5</span></div>
-            <div class="ss-row"><span class="k">Context</span><span class="v accent">57% · 114k / 200k</span></div>
-            <div class="ss-row"><span class="k">Spent · Burn</span><span class="v">$4.18 · $0.21/m</span></div>
-            <div class="ss-row"><span class="k">Saved (cache)</span><span class="v good">$6.18</span></div>
+    <!-- Tab panes -->
+    <div class="showcase-panes">
+
+      <!-- ── WIDGET PANE (hidden by default) ── -->
+      <div class="showcase-pane" id="pane-widget" style="display:none">
+          <div class="widget-pane-wrap reveal" style="display:flex; flex-direction:column; align-items:center;">
+          <div class="widget-pane-frame">
+            <div class="panel-body">
+              <div class="widget" id="showcaseWidget">
+
+                <!-- Slide 1 · QUOTA -->
+                <div class="wslide active" data-w="0">
+                  <div class="w-eyebrow">QUOTA</div>
+
+                  <div class="q-row">
+                    <div class="q-lbl">5h window <span class="q-meta">· resets 2h 18m</span></div>
+                    <div class="q-pct warn">42%</div>
+                  </div>
+                  <div class="q-bar"><i style="width:42%"></i></div>
+
+                  <div class="q-row"><div class="q-lbl">Weekly · all</div><div class="q-pct">71%</div></div>
+                  <div class="q-bar"><i style="width:71%" class="warn"></i></div>
+
+                  <div class="q-row"><div class="q-lbl">Weekly · Sonnet</div><div class="q-pct">68%</div></div>
+                  <div class="q-bar"><i style="width:68%"></i></div>
+
+                  <div class="q-forecast">
+                    <span class="q-fi">⏱</span>
+                    <span>hit limit in <b>~2h 18m</b> at $0.21/min</span>
+                  </div>
+
+                  <div class="q-spark-head">
+                    <span>Last 7 days</span>
+                    <span>today <b>$14.62</b></span>
+                  </div>
+                  <div class="q-spark" data-spark="1"></div>
+                </div>
+
+                <!-- Slide 2 · SESSION NOW -->
+                <div class="wslide" data-w="1">
+                  <div class="s-head">
+                    <span class="s-title">acme-api <span class="s-model">· sonnet-4.5</span></span>
+                    <span class="s-dur">22m</span>
+                  </div>
+
+                  <div class="s-ctx-row">
+                    <span class="s-ctx-lbl">Context · 114k / 200k</span>
+                    <span class="s-ctx-pct">57%</span>
+                  </div>
+                  <div class="s-ctx-bar"><i style="width:57%"></i></div>
+
+                  <div class="s-cells">
+                    <div><div class="s-ck">SPENT</div><div class="s-cv coral">$4.18</div></div>
+                    <div><div class="s-ck">BURN</div><div class="s-cv">$0.21/m</div></div>
+                    <div><div class="s-ck">SAVED</div><div class="s-cv good">$6.18</div></div>
+                  </div>
+
+                  <div class="s-today-head">TODAY</div>
+                  <div class="s-stack">
+                    <i style="width:82%;background:var(--accent)" title="sonnet-4.5 · 82%"></i>
+                    <i style="width:14%;background:color-mix(in oklab, var(--accent) 60%, var(--model-mix))" title="opus-4.5 · 14%"></i>
+                    <i style="width:4%;background:var(--ink-3)" title="haiku-4.5 · 4%"></i>
+                  </div>
+                  <div class="s-model-row">
+                    <span><i class="dot" style="background:var(--accent)"></i>sonnet-4.5</span>
+                    <span class="s-model-v">$62.80 · 82%</span>
+                  </div>
+                  <div class="s-model-row">
+                    <span><i class="dot" style="background:color-mix(in oklab, var(--accent) 60%, var(--model-mix))"></i>opus-4.5</span>
+                    <span class="s-model-v">$18.94 · 14%</span>
+                  </div>
+                  <div class="s-model-row">
+                    <span><i class="dot" style="background:var(--ink-3)"></i>haiku-4.5</span>
+                    <span class="s-model-v">$0.82 · 4%</span>
+                  </div>
+                </div>
+
+                <!-- Slide 3 · LAST RECAP -->
+                <div class="wslide" data-w="2">
+                  <div class="r-head">
+                    <span class="r-title">Last session</span>
+                    <span class="r-time">18m ago</span>
+                  </div>
+
+                  <div class="r-quote">&ldquo;Swapped callback-based JWT check for async verify; added refresh-token rotation across both gateways.&rdquo;</div>
+
+                  <div class="r-kv"><span class="r-k">outcome</span><span class="r-v good">fully_achieved</span></div>
+                  <div class="r-kv"><span class="r-k">helpful</span><span class="r-v good">very_helpful</span></div>
+
+                  <div class="r-meta"><span class="r-add">+214</span> / <span class="r-del">-88</span> lines · 2 commits · 7 files</div>
+                  <div class="r-friction">friction: timeout ×2 · permission_denied ×1</div>
+                </div>
+
+              </div>
+            </div>
           </div>
-        </div>
-
-        <div class="ss-group" data-g="today">
-          <div class="ss-gh"><span>TODAY</span><span class="caret">▾</span></div>
-          <div class="ss-gb">
-            <div class="ss-row"><span class="k">Spend</span><span class="v">$14.62</span></div>
-            <div class="ss-row"><span class="k">Sessions</span><span class="v">7 · longest 72m</span></div>
-            <div class="ss-row"><span class="k">Tokens</span><span class="v">1.12M · 62% cached</span></div>
-            <div class="ss-row"><span class="k">Top project</span><span class="v">acme-api · 44%</span></div>
-          </div>
-        </div>
-
-        <div class="ss-group" data-g="quota">
-          <div class="ss-gh"><span>QUOTA</span><span class="caret">▾</span></div>
-          <div class="ss-gb">
-            <div class="ss-qline"><span class="k">5h window</span><span class="v">42%</span></div>
-            <div class="ss-bar"><i style="width:42%"></i></div>
-            <div class="ss-qline"><span class="k">7d window</span><span class="v warn">71%</span></div>
-            <div class="ss-bar"><i class="warn" style="width:71%"></i></div>
-            <div class="ss-qline"><span class="k">Sonnet 7d</span><span class="v">68%</span></div>
-            <div class="ss-bar"><i style="width:68%"></i></div>
-            <div class="ss-note">↻ resets 17:42 · ETA ~2h 18m</div>
-          </div>
-        </div>
-
-        <div class="ss-group" data-g="models">
-          <div class="ss-gh"><span>MODELS &amp; TOOLS</span><span class="caret">▾</span></div>
-          <div class="ss-gb">
-            <div class="ss-row"><span class="k">sonnet-4.5</span><span class="v">82% · $62.80</span></div>
-            <div class="ss-row"><span class="k">opus-4.5</span><span class="v">14% · $18.94</span></div>
-            <div class="ss-row"><span class="k">haiku-4.5</span><span class="v">4% · $0.82</span></div>
-            <div class="ss-sep"></div>
-            <div class="ss-row"><span class="k">Top tool</span><span class="v">Edit · 1,412</span></div>
-            <div class="ss-row"><span class="k">Bash errors</span><span class="v warn">11</span></div>
-          </div>
-        </div>
-
-        <div class="ss-group" data-g="insights">
-          <div class="ss-gh"><span>INSIGHTS</span><span class="caret">▾</span></div>
-          <div class="ss-gb">
-            <div class="ss-ins good">✓ Cache saved $6.18 this week</div>
-            <div class="ss-ins warn">! 3 sessions above 90% context</div>
-            <div class="ss-ins info">i Opus use ↓ 34% WoW · Sonnet handled refactors fine</div>
+          <div class="widget-pane-desc" style="text-align:center; margin-top:16px;">
+            <h4>Explorer widget — 3 slides</h4>
+            <p>A compact carousel in VS Code's Explorer panel. Auto-rotates through Quota, Session Now, and Last Recap. Pin it, glance, keep coding.</p>
           </div>
         </div>
       </div>
+      </div><!-- /pane-widget -->
 
-      <!-- Descriptions -->
-      <div class="ss-desc">
-        <div class="ss-d-item">
-          <div class="ss-num mono">01</div>
-          <div>
-            <h4>NOW · live session</h4>
-            <p>Project, model, context %, spend, burn rate, cache savings — updated every time a JSONL line lands. The only group that ticks between breaths.</p>
+      <!-- ── SIDEBAR PANE (default active) ── -->
+      <div class="showcase-pane active" id="pane-sidebar">
+        <div class="ss-grid reveal">
+          <!-- Sidebar mock -->
+          <div class="ss-sidebar">
+            <div class="ss-side-head">
+              <span class="ss-dot"></span>
+              <span class="ss-title">TOKSIGHT</span>
+              <span class="ss-user mono">@huypg</span>
+            </div>
+
+            <div class="ss-group" data-g="now">
+              <div class="ss-gh"><span>NOW</span><span class="caret">▾</span></div>
+              <div class="ss-gb">
+                <div class="ss-row"><span class="k">Project</span><span class="v">acme-api</span></div>
+                <div class="ss-row"><span class="k">Model</span><span class="v pill">sonnet-4.5</span></div>
+                <div class="ss-row"><span class="k">Context</span><span class="v accent">57% · 114k / 200k</span></div>
+                <div class="ss-row"><span class="k">Spent · Burn</span><span class="v">$4.18 · $0.21/m</span></div>
+                <div class="ss-row"><span class="k">Saved (cache)</span><span class="v good">$6.18</span></div>
+              </div>
+            </div>
+
+            <div class="ss-group" data-g="today">
+              <div class="ss-gh"><span>TODAY</span><span class="caret">▾</span></div>
+              <div class="ss-gb">
+                <div class="ss-row"><span class="k">Spend</span><span class="v">$14.62</span></div>
+                <div class="ss-row"><span class="k">Sessions</span><span class="v">7 · longest 72m</span></div>
+                <div class="ss-row"><span class="k">Tokens</span><span class="v">1.12M · 62% cached</span></div>
+                <div class="ss-row"><span class="k">Top project</span><span class="v">acme-api · 44%</span></div>
+              </div>
+            </div>
+
+            <div class="ss-group" data-g="quota">
+              <div class="ss-gh"><span>QUOTA</span><span class="caret">▾</span></div>
+              <div class="ss-gb">
+                <div class="ss-qline"><span class="k">5h window</span><span class="v">42%</span></div>
+                <div class="ss-bar"><i style="width:42%"></i></div>
+                <div class="ss-qline"><span class="k">7d window</span><span class="v warn">71%</span></div>
+                <div class="ss-bar"><i class="warn" style="width:71%"></i></div>
+                <div class="ss-qline"><span class="k">Sonnet 7d</span><span class="v">68%</span></div>
+                <div class="ss-bar"><i style="width:68%"></i></div>
+                <div class="ss-note">↻ resets 17:42 · ETA ~2h 18m</div>
+              </div>
+            </div>
+
+            <div class="ss-group" data-g="models">
+              <div class="ss-gh"><span>MODELS &amp; TOOLS</span><span class="caret">▾</span></div>
+              <div class="ss-gb">
+                <div class="ss-row"><span class="k">sonnet-4.5</span><span class="v">82% · $62.80</span></div>
+                <div class="ss-row"><span class="k">opus-4.5</span><span class="v">14% · $18.94</span></div>
+                <div class="ss-row"><span class="k">haiku-4.5</span><span class="v">4% · $0.82</span></div>
+                <div class="ss-sep"></div>
+                <div class="ss-row"><span class="k">Top tool</span><span class="v">Edit · 1,412</span></div>
+                <div class="ss-row"><span class="k">Bash errors</span><span class="v warn">11</span></div>
+              </div>
+            </div>
+
+            <div class="ss-group" data-g="insights">
+              <div class="ss-gh"><span>INSIGHTS</span><span class="caret">▾</span></div>
+              <div class="ss-gb">
+                <div class="ss-ins good">✓ Cache saved $6.18 this week</div>
+                <div class="ss-ins warn">! 3 sessions above 90% context</div>
+                <div class="ss-ins info">i Opus use ↓ 34% WoW · Sonnet handled refactors fine</div>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="ss-d-item">
-          <div class="ss-num mono">02</div>
-          <div>
-            <h4>TODAY · aggregated</h4>
-            <p>Rolling window since midnight local. Tokens, cached %, session count, longest session, and which project ate the most of your day.</p>
-          </div>
-        </div>
-        <div class="ss-d-item">
-          <div class="ss-num mono">03</div>
-          <div>
-            <h4>QUOTA · OAuth (optional)</h4>
-            <p>The only group that calls out. Opt-in via <span class="mono">toksight.oauthEnabled</span> to pull the 5h and 7d windows Anthropic actually counts against — plus the Sonnet 7-day sub-window.</p>
-          </div>
-        </div>
-        <div class="ss-d-item">
-          <div class="ss-num mono">04</div>
-          <div>
-            <h4>MODELS &amp; TOOLS · 7d</h4>
-            <p>Model mix by cost and token share. Tool call counts with error rates — so you notice when Bash has been failing half the time.</p>
-          </div>
-        </div>
-        <div class="ss-d-item">
-          <div class="ss-num mono">05</div>
-          <div>
-            <h4>INSIGHTS · rule-based</h4>
-            <p>Up to 3 actionable observations from the insights engine: cache wins, friction points, unusual patterns. No LLM round-trip — just deterministic rules over your own data.</p>
+
+          <!-- Descriptions -->
+          <div class="ss-desc">
+            <div class="ss-d-item">
+              <div class="ss-num mono">01</div>
+              <div>
+                <h4>NOW · live session</h4>
+                <p>Project, model, context %, spend, burn rate, cache savings — updated every time a JSONL line lands. The only group that ticks between breaths.</p>
+              </div>
+            </div>
+            <div class="ss-d-item">
+              <div class="ss-num mono">02</div>
+              <div>
+                <h4>TODAY · aggregated</h4>
+                <p>Rolling window since midnight local. Tokens, cached %, session count, longest session, and which project ate the most of your day.</p>
+              </div>
+            </div>
+            <div class="ss-d-item">
+              <div class="ss-num mono">03</div>
+              <div>
+                <h4>QUOTA · OAuth (optional)</h4>
+                <p>The only group that calls out. Opt-in via <span class="mono">toksight.oauthEnabled</span> to pull the 5h and 7d windows Anthropic actually counts against — plus the Sonnet 7-day sub-window.</p>
+              </div>
+            </div>
+            <div class="ss-d-item">
+              <div class="ss-num mono">04</div>
+              <div>
+                <h4>MODELS &amp; TOOLS · 7d</h4>
+                <p>Model mix by cost and token share. Tool call counts with error rates — so you notice when Bash has been failing half the time.</p>
+              </div>
+            </div>
+            <div class="ss-d-item">
+              <div class="ss-num mono">05</div>
+              <div>
+                <h4>INSIGHTS · rule-based</h4>
+                <p>Up to 3 actionable observations from the insights engine: cache wins, friction points, unusual patterns. No LLM round-trip — just deterministic rules over your own data.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      </div><!-- /pane-sidebar -->
+
+      <!-- ── DASHBOARD PANE ── -->
+      <div class="showcase-pane" id="pane-dashboard" style="display:none">
+        <div class="dash-frame reveal">
+          <!-- Chrome bar (fake browser/VS Code tab) -->
+          <div class="dash-topbar">
+            <div class="tl"><span></span><span></span><span></span></div>
+            <div class="editor-title mono">TokSight — Dashboard</div>
+          </div>
+
+          <!-- Real dashboard header: serif title LEFT + time-range dropdown RIGHT -->
+          <div class="fp-header" id="dashHeader">
+            <h3 class="fp-title" id="dashTitle">TokSight · Quota</h3>
+            <div class="fp-range">
+              <span id="dashRangeLbl">Last 7 days</span>
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 4 l3 3 l3-3" stroke="currentColor" stroke-width="1.4"/></svg>
+            </div>
+          </div>
+
+          <!-- Body: left nav (200px) + main content -->
+          <div class="fp-body">
+            <nav class="fp-nav" id="dashTabs">
+              <button class="fp-nav-item active" data-d="quota">Quota</button>
+              <button class="fp-nav-item" data-d="sessions">Sessions</button>
+              <button class="fp-nav-item" data-d="projects">Projects</button>
+              <button class="fp-nav-item" data-d="models-tools">Models &amp; Tools</button>
+              <button class="fp-nav-item" data-d="insights">Insights</button>
+            </nav>
+            <div class="fp-main" id="dashMain">
+          <div class="dash-pane active" data-p="quota">
+            <!-- Section 1: Hero KPI + 3 secondary stats -->
+            <div class="fp-stats">
+              <div class="fp-stat hero">
+                <div class="fp-stat-k">Week · all models</div>
+                <div class="fp-stat-v warn">71%</div>
+                <div class="fp-hero-bar"><div class="warn" style="width: 71%;"></div></div>
+                <div class="fp-stat-n">resets in 3d 14h</div>
+              </div>
+              <div class="fp-stat">
+                <div class="fp-stat-k">Today spend</div>
+                <div class="fp-stat-v">$14.80</div>
+                <div class="fp-stat-n">+23% vs yesterday</div>
+              </div>
+              <div class="fp-stat">
+                <div class="fp-stat-k">Cache saved · 7d</div>
+                <div class="fp-stat-v success">$6.18</div>
+                <div class="fp-stat-n">71% hit rate</div>
+              </div>
+              <div class="fp-stat">
+                <div class="fp-stat-k">Total spend · 7d</div>
+                <div class="fp-stat-v">$86.40</div>
+                <div class="fp-stat-n">&nbsp;</div>
+              </div>
+            </div>
+
+            <!-- Section 2: Current quota -->
+            <div class="fp-subhead">Current quota</div>
+            <div class="fp-two-col">
+              <div>
+                <div class="fp-row"><span class="fp-row-label">5h window</span><span class="fp-row-value accent">42%</span></div>
+                <div class="fp-bar"><div class="fp-bar-fill" style="width: 42%;"></div></div>
+                <div class="fp-quota-note">resets in 2h 18m</div>
+                <div class="fp-divider"></div>
+                <div class="fp-row"><span class="fp-row-label">Weekly · all models</span><span class="fp-row-value">71%</span></div>
+                <div class="fp-bar"><div class="fp-bar-fill warn" style="width: 71%;"></div></div>
+                <div class="fp-quota-note">resets in 3d 14h</div>
+                <div class="fp-row" style="margin-top: 10px;"><span class="fp-row-label">Weekly · Sonnet only</span><span class="fp-row-value">68%</span></div>
+                <div class="fp-bar"><div class="fp-bar-fill" style="width: 68%;"></div></div>
+              </div>
+              <div>
+                <div class="cache-card">
+                  <h4>Forecast &amp; burn</h4>
+                  <div class="cc-row"><span class="cc-k">Hit 5h cap in</span><span class="cc-v">~2h 15m</span></div>
+                  <div class="cc-row"><span class="cc-k">Current burn</span><span class="cc-v">$0.040/min</span></div>
+                  <div class="cc-row"><span class="cc-k">Peak today</span><span class="cc-v">$1.090/min · 27m ago</span></div>
+                  <div class="cc-row"><span class="cc-k">ETA weekly cap</span><span class="cc-v">resets in 3d 14h</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 3: 7-day spend chart -->
+            <div class="fp-subhead">7-day spend</div>
+            <div class="spend7-wrap">
+              <span class="spend7-max">max $18.20</span>
+              <div class="spend7-big">
+                <div class="spend7-avg" style="bottom: 47%;" title="avg $8.60"></div>
+                <div class="b" style="height: 52%;" title="Mon · $9.40"></div>
+                <div class="b" style="height: 34%;" title="Tue · $6.12"></div>
+                <div class="b" style="height: 68%;" title="Wed · $12.40"></div>
+                <div class="b" style="height: 42%;" title="Thu · $7.60"></div>
+                <div class="b" style="height: 78%;" title="Fri · $14.20"></div>
+                <div class="b" style="height: 100%;" title="Sat · $18.20"></div>
+                <div class="b today" style="height: 82%;" title="Today · $14.80"></div>
+              </div>
+              <div class="spend7-big-labels">
+                <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Today</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="dash-pane" data-p="sessions" style="display:none">
+            <!-- fp-stats -->
+            <div class="fp-stats" style="margin-bottom: 20px;">
+              <div class="fp-stat">
+                <div class="fp-stat-k">Sessions · 7d</div>
+                <div class="fp-stat-v">37</div>
+                <div class="fp-stat-n">7d window</div>
+              </div>
+              <div class="fp-stat">
+                <div class="fp-stat-k">Avg duration</div>
+                <div class="fp-stat-v">42m</div>
+                <div class="fp-stat-n">7d window</div>
+              </div>
+              <div class="fp-stat">
+                <div class="fp-stat-k">Longest</div>
+                <div class="fp-stat-v">1h 12m</div>
+                <div class="fp-stat-n">Sonnet · today</div>
+              </div>
+              <div class="fp-stat">
+                <div class="fp-stat-k">Median / session</div>
+                <div class="fp-stat-v">$2.33</div>
+                <div class="fp-stat-n">p50 · 7d</div>
+              </div>
+            </div>
+
+            <!-- Today timeline -->
+            <div style="margin-bottom: 24px;">
+              <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Today timeline · 24h</div>
+              <div class="fp-timeline">
+                <div class="fp-t-cell" style="height: 0;"></div>
+                <div class="fp-t-cell" style="height: 0;"></div>
+                <div class="fp-t-cell" style="height: 0;"></div>
+                <div class="fp-t-cell" style="height: 0;"></div>
+                <div class="fp-t-cell" style="height: 0;"></div>
+                <div class="fp-t-cell" style="height: 0;"></div>
+                <div class="fp-t-cell" style="height: 0;"></div>
+                <div class="fp-t-cell" style="height: 18%;" title="07:00 $0.42"></div>
+                <div class="fp-t-cell" style="height: 34%;" title="08:00 $0.78"></div>
+                <div class="fp-t-cell" style="height: 62%;" title="09:00 $1.42"></div>
+                <div class="fp-t-cell" style="height: 88%;" title="10:00 $2.01"></div>
+                <div class="fp-t-cell" style="height: 74%;" title="11:00 $1.70"></div>
+                <div class="fp-t-cell" style="height: 24%;" title="12:00 $0.55"></div>
+                <div class="fp-t-cell" style="height: 58%;" title="13:00 $1.33"></div>
+                <div class="fp-t-cell active" style="height: 92%;" title="14:00 $2.10"></div>
+                <div class="fp-t-cell" style="height: 0;"></div>
+                <div class="fp-t-cell" style="height: 0;"></div>
+                <div class="fp-t-cell" style="height: 0;"></div>
+                <div class="fp-t-cell" style="height: 0;"></div>
+                <div class="fp-t-cell" style="height: 0;"></div>
+                <div class="fp-t-cell" style="height: 0;"></div>
+                <div class="fp-t-cell" style="height: 0;"></div>
+                <div class="fp-t-cell" style="height: 0;"></div>
+                <div class="fp-t-cell" style="height: 0;"></div>
+              </div>
+              <div class="fp-timeline-labels">
+                <span>00</span><span>06</span><span>12</span><span>now · 14</span><span>18</span><span>24</span>
+              </div>
+            </div>
+
+            <!-- Active session card -->
+            <div style="margin-bottom: 24px;">
+              <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Active session</div>
+              <div class="active-card">
+                <div><div class="ac-k">Project</div><div class="ac-v">acme-api</div></div>
+                <div><div class="ac-k">Model</div><div class="ac-v">claude-sonnet-4-6</div></div>
+                <div><div class="ac-k">Duration</div><div class="ac-v">48m</div></div>
+                <div><div class="ac-k">Tools</div><div class="ac-v">142 calls</div></div>
+                <div><div class="ac-k">Tokens</div><div class="ac-v">214,820 (+480/-120 lines)</div></div>
+                <div><div class="ac-k">Cost · burn</div><div class="ac-v">$6.41 · $0.133/min</div></div>
+                <div><div class="ac-k">Started</div><div class="ac-v">13:14</div></div>
+                <div><div class="ac-k">Session id</div><div class="ac-v">a8f4…c2e1</div></div>
+              </div>
+            </div>
+
+            <!-- Sessions table -->
+            <div style="margin-bottom: 24px;">
+              <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Sessions · 7d</div>
+              <div class="fp-filters">
+                <select><option>All projects</option><option>acme-api</option><option>ui-kit</option><option>obs-pipeline</option></select>
+                <select><option>All models</option><option>sonnet</option><option>opus</option><option>haiku</option></select>
+              </div>
+              <table class="fp">
+                <thead>
+                  <tr>
+                    <th>When</th><th>Project</th><th>Model</th>
+                    <th class="num">Dur</th><th class="num">Tokens</th><th class="num">Cost</th><th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>2m ago</td><td>acme-api</td><td>sonnet</td><td class="num">48m</td><td class="num">215k</td><td class="num">$6.41</td><td>active</td></tr>
+                  <tr><td>1h ago</td><td>acme-api</td><td>sonnet</td><td class="num">32m</td><td class="num">108k</td><td class="num">$3.22</td><td>—</td></tr>
+                  <tr><td>3h ago</td><td>ui-kit</td><td>opus</td><td class="num">1h 12m</td><td class="num">402k</td><td class="num">$14.80</td><td>—</td></tr>
+                  <tr><td>5h ago</td><td>acme-api</td><td>sonnet</td><td class="num">22m</td><td class="num">74k</td><td class="num">$2.18</td><td>—</td></tr>
+                  <tr><td>yesterday</td><td>obs-pipeline</td><td>sonnet</td><td class="num">58m</td><td class="num">186k</td><td class="num">$5.58</td><td>—</td></tr>
+                  <tr><td>yesterday</td><td>ui-kit</td><td>sonnet</td><td class="num">14m</td><td class="num">42k</td><td class="num">$1.20</td><td>—</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Latest recap -->
+            <div>
+              <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Latest recap</div>
+              <div class="recap-hero">
+                <div class="rh-title">Refactored auth middleware to use shared JWT helper</div>
+                <div class="rh-meta">acme-api · claude-sonnet-4-6 · 48m · 3 commits · shipped · helpfulness very high</div>
+                <div class="rh-body">Refactored auth middleware to use shared JWT helper. Broke the monolithic verifier into sign / verify / rotate primitives and wired the Stripe webhook through the new guard. Added 9 tests covering expiry edge cases.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dash-pane" data-p="projects" style="display:none">
+            <!-- fp-stats -->
+            <div class="fp-stats" style="margin-bottom: 20px;">
+              <div class="fp-stat">
+                <div class="fp-stat-k">Active projects</div>
+                <div class="fp-stat-v">6</div>
+                <div class="fp-stat-n">7d window</div>
+              </div>
+              <div class="fp-stat">
+                <div class="fp-stat-k">Top project</div>
+                <div class="fp-stat-v" style="font-size: 28px;">acme-api</div>
+                <div class="fp-stat-n">44% share</div>
+              </div>
+              <div class="fp-stat">
+                <div class="fp-stat-k">Last active</div>
+                <div class="fp-stat-v" style="font-size: 28px;">acme-api</div>
+                <div class="fp-stat-n">2m ago</div>
+              </div>
+              <div class="fp-stat">
+                <div class="fp-stat-k">Projects · new</div>
+                <div class="fp-stat-v">2</div>
+                <div class="fp-stat-n">first-seen 7d</div>
+              </div>
+            </div>
+
+            <!-- Today split -->
+            <div style="margin-bottom: 24px;">
+              <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Today · project split</div>
+              <div class="proj-split">
+                <i style="width: 52%; background: var(--accent);"></i>
+                <i style="width: 26%; background: var(--model-opus);"></i>
+                <i style="width: 14%; background: var(--model-sonnet);"></i>
+                <i style="width: 8%; background: var(--model-haiku);"></i>
+              </div>
+              <div class="mt-rows">
+                <div class="mt-row"><span class="dot" style="background: var(--accent);"></span><span>acme-api · 3 sessions</span><span class="mt-v">$4.12 · 52%</span></div>
+                <div class="mt-row"><span class="dot" style="background: var(--model-opus);"></span><span>ui-kit · 2 sessions</span><span class="mt-v">$2.08 · 26%</span></div>
+                <div class="mt-row"><span class="dot" style="background: var(--model-sonnet);"></span><span>obs-pipeline · 1 session</span><span class="mt-v">$1.12 · 14%</span></div>
+                <div class="mt-row"><span class="dot" style="background: var(--model-haiku);"></span><span>docs-site · 1 session</span><span class="mt-v">$0.63 · 8%</span></div>
+              </div>
+            </div>
+
+            <!-- Project ranking -->
+            <div style="margin-bottom: 24px;">
+              <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Project ranking · 7d</div>
+              <table class="fp">
+                <thead>
+                  <tr>
+                    <th>Project</th>
+                    <th class="num">Sessions</th>
+                    <th class="num">Tokens</th>
+                    <th class="num">Cost</th>
+                    <th>Share</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>acme-api</td><td class="num">14</td><td class="num">1.8M</td><td class="num">$38.14</td><td><div class="share-bar"><i style="width: 44%;"></i></div></td></tr>
+                  <tr><td>ui-kit</td><td class="num">8</td><td class="num">1.1M</td><td class="num">$24.60</td><td><div class="share-bar"><i style="width: 28%;"></i></div></td></tr>
+                  <tr><td>obs-pipeline</td><td class="num">6</td><td class="num">580k</td><td class="num">$12.90</td><td><div class="share-bar"><i style="width: 15%;"></i></div></td></tr>
+                  <tr><td>docs-site</td><td class="num">3</td><td class="num">220k</td><td class="num">$6.42</td><td><div class="share-bar"><i style="width: 7%;"></i></div></td></tr>
+                  <tr><td>infra-terraform</td><td class="num">2</td><td class="num">120k</td><td class="num">$3.18</td><td><div class="share-bar"><i style="width: 4%;"></i></div></td></tr>
+                  <tr><td>home-dotfiles</td><td class="num">4</td><td class="num">42k</td><td class="num">$1.16</td><td><div class="share-bar"><i style="width: 2%;"></i></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Top project drill -->
+            <div>
+              <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Top project · acme-api</div>
+              <div class="two-col">
+                <div class="drill-card">
+                  <h4>Model mix</h4>
+                  <div class="model-stack">
+                    <i style="width: 72%; background: var(--model-sonnet);"></i>
+                    <i style="width: 22%; background: var(--model-opus);"></i>
+                    <i style="width: 6%; background: var(--model-haiku);"></i>
+                  </div>
+                  <div class="mt-rows">
+                    <div class="mt-row"><span class="model-chip sonnet"></span><span>Sonnet</span><span class="mt-v">1.3M · $27.48</span></div>
+                    <div class="mt-row"><span class="model-chip opus"></span><span>Opus</span><span class="mt-v">400k · $10.12</span></div>
+                    <div class="mt-row"><span class="model-chip haiku"></span><span>Haiku</span><span class="mt-v">100k · $0.54</span></div>
+                  </div>
+                </div>
+                <div class="drill-card">
+                  <h4>Recent sessions</h4>
+                  <div class="mt-rows">
+                    <div class="mt-row"><span></span><span>Refactor auth middleware</span><span class="mt-v">$6.41</span></div>
+                    <div class="mt-row"><span></span><span>Debug Stripe webhook</span><span class="mt-v">$3.22</span></div>
+                    <div class="mt-row"><span></span><span>Write migration plan</span><span class="mt-v">$2.18</span></div>
+                    <div class="mt-row"><span></span><span>Add feature flag loader</span><span class="mt-v">$1.40</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dash-pane" data-p="models" style="display:none">
+            <!-- Model mix -->
+            <div style="margin-bottom: 24px;">
+              <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Model mix · 7d</div>
+              <div class="model-stack">
+                <i style="width: 76%; background: var(--model-sonnet);"></i>
+                <i style="width: 18%; background: var(--model-opus);"></i>
+                <i style="width: 6%; background: var(--model-haiku);"></i>
+              </div>
+              <div class="mt-rows">
+                <div class="mt-row"><span class="model-chip sonnet"></span><span>claude-sonnet-4-6</span><span class="mt-v">3.4M · $62.80</span></div>
+                <div class="mt-row"><span class="model-chip opus"></span><span>claude-opus-4-6</span><span class="mt-v">420k · $18.94</span></div>
+                <div class="mt-row"><span class="model-chip haiku"></span><span>claude-haiku-4-5</span><span class="mt-v">198k · $0.82</span></div>
+              </div>
+            </div>
+
+            <!-- Token breakdown -->
+            <div style="margin-bottom: 24px;">
+              <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Token breakdown · 7d</div>
+              <div class="token-cells">
+                <div class="tc"><div class="tc-k">Input</div><div class="tc-v">642k</div></div>
+                <div class="tc"><div class="tc-k">Output</div><div class="tc-v">568k</div></div>
+                <div class="tc"><div class="tc-k">Cache read</div><div class="tc-v">2.4M</div></div>
+                <div class="tc"><div class="tc-k">Cache create</div><div class="tc-v">380k</div></div>
+              </div>
+              <div style="margin-top: 14px;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; margin-bottom: 6px;">
+                  <span>Output ratio</span><span>14.2%</span>
+                </div>
+                <div class="fp-bar"><div class="fp-bar-fill" style="width: 14.2%;"></div></div>
+              </div>
+            </div>
+
+            <!-- Tools table -->
+            <div style="margin-bottom: 24px;">
+              <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Tools · 7d</div>
+              <table class="fp">
+                <thead>
+                  <tr>
+                    <th>Tool</th>
+                    <th class="num">Calls</th>
+                    <th class="num">Tokens</th>
+                    <th class="num">Cost</th>
+                    <th class="num">Errors</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Read</td><td class="num">2,104</td><td class="num">640k</td><td class="num">$12.40</td><td class="num">0</td></tr>
+                  <tr><td>Edit</td><td class="num">1,412</td><td class="num">420k</td><td class="num">$9.82</td><td class="num">2</td></tr>
+                  <tr><td>Bash</td><td class="num">892</td><td class="num">280k</td><td class="num">$6.18</td><td class="num">11</td></tr>
+                  <tr><td>Grep</td><td class="num">412</td><td class="num">88k</td><td class="num">$2.04</td><td class="num">0</td></tr>
+                  <tr><td>Glob</td><td class="num">248</td><td class="num">42k</td><td class="num">$0.96</td><td class="num">0</td></tr>
+                  <tr><td>Write</td><td class="num">180</td><td class="num">112k</td><td class="num">$2.60</td><td class="num">1</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- MCP · Skills -->
+            <div style="margin-bottom: 24px;">
+              <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">MCP · Skills</div>
+              <div class="two-col">
+                <div class="drill-card">
+                  <h4>MCP servers</h4>
+                  <div class="mt-rows">
+                    <div class="mt-row"><span></span><span>gitnexus · query</span><span class="mt-v">84 calls</span></div>
+                    <div class="mt-row"><span></span><span>gitnexus · impact</span><span class="mt-v">36 calls</span></div>
+                    <div class="mt-row"><span></span><span>vanna · run_sql</span><span class="mt-v">18 calls</span></div>
+                  </div>
+                </div>
+                <div class="drill-card">
+                  <h4>Skills used</h4>
+                  <div class="mt-rows">
+                    <div class="mt-row"><span></span><span>writing-plans</span><span class="mt-v">12</span></div>
+                    <div class="mt-row"><span></span><span>brainstorming</span><span class="mt-v">8</span></div>
+                    <div class="mt-row"><span></span><span>executing-plans</span><span class="mt-v">5</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cache performance -->
+            <div>
+              <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Cache performance</div>
+              <div class="cache-card">
+                <div><div class="cc-k">Hit rate</div><div class="cc-v">71%</div><div class="cc-n">7d average</div></div>
+                <div><div class="cc-k">Cache saved</div><div class="cc-v" style="color: var(--good);">−$6.18</div><div class="cc-n">vs. fresh reads</div></div>
+                <div><div class="cc-k">Cache writes</div><div class="cc-v">380k</div><div class="cc-n">create tokens</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dash-pane" data-p="insights" style="display:none">
+            <!-- Recent recaps -->
+            <div style="margin-bottom: 24px;">
+              <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Recent recaps</div>
+              <div class="recap-hero">
+                <div class="rh-title">Refactored auth middleware to use shared JWT helper</div>
+                <div class="rh-meta">acme-api · sonnet · 48m · 3 commits · shipped · helpfulness very high</div>
+                <div class="rh-body">Broke the monolithic verifier into sign / verify / rotate primitives. Wired Stripe webhook through the new guard. Added 9 tests covering expiry edge cases.</div>
+              </div>
+              <div class="recap-hero">
+                <div class="rh-title">Design system audit — tokens consolidated into one file</div>
+                <div class="rh-meta">ui-kit · opus · 1h 12m · 2 commits · shipped · helpfulness high</div>
+                <div class="rh-body">Mapped 14 ad-hoc color variables back to Claude palette tokens. Deleted 3 duplicate border-radius scales. One regression caught by visual-snapshot suite and reverted.</div>
+              </div>
+            </div>
+
+            <!-- Live insights -->
+            <div style="margin-bottom: 24px;">
+              <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Live insights</div>
+              <div class="dist-row"><div class="dist-k">5h window spend</div><div class="dist-bar"><div class="dist-fill warn" style="width: 68%;"></div></div><div class="dist-v">$3.42 / $5</div></div>
+              <div class="dist-row"><div class="dist-k">Peak burn today</div><div class="dist-bar"><div class="dist-fill" style="width: 44%;"></div></div><div class="dist-v">$0.19/min</div></div>
+              <div class="dist-row"><div class="dist-k">Context pressure</div><div class="dist-bar"><div class="dist-fill danger" style="width: 94%;"></div></div><div class="dist-v">94% · 3 sess</div></div>
+            </div>
+
+            <!-- Outcome distribution -->
+            <div style="margin-bottom: 24px;">
+              <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Outcome distribution · 7d</div>
+              <div class="dist-row"><div class="dist-k">Shipped</div><div class="dist-bar"><div class="dist-fill success" style="width: 74%;"></div></div><div class="dist-v">27</div></div>
+              <div class="dist-row"><div class="dist-k">Paused</div><div class="dist-bar"><div class="dist-fill warn" style="width: 19%;"></div></div><div class="dist-v">7</div></div>
+              <div class="dist-row"><div class="dist-k">Abandoned</div><div class="dist-bar"><div class="dist-fill danger" style="width: 7%;"></div></div><div class="dist-v">3</div></div>
+            </div>
+
+            <!-- Helpfulness -->
+            <div style="margin-bottom: 24px;">
+              <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Claude helpfulness · 7d</div>
+              <div class="dist-row"><div class="dist-k">★★★★★ Very high</div><div class="dist-bar"><div class="dist-fill" style="width: 48%;"></div></div><div class="dist-v">18</div></div>
+              <div class="dist-row"><div class="dist-k">★★★★ High</div><div class="dist-bar"><div class="dist-fill" style="width: 30%;"></div></div><div class="dist-v">11</div></div>
+              <div class="dist-row"><div class="dist-k">★★★ Mixed</div><div class="dist-bar"><div class="dist-fill warn" style="width: 16%;"></div></div><div class="dist-v">6</div></div>
+              <div class="dist-row"><div class="dist-k">★★ / ★ Low</div><div class="dist-bar"><div class="dist-fill danger" style="width: 6%;"></div></div><div class="dist-v">2</div></div>
+            </div>
+
+            <!-- Friction / Tool errors -->
+            <div style="margin-bottom: 24px;">
+              <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Friction · 7d</div>
+              <div class="two-col">
+                <div class="drill-card">
+                  <h4>Friction history</h4>
+                  <div class="mt-rows">
+                    <div class="mt-row"><span></span><span>Stripe webhook — env parsing</span><span class="mt-v">reverted</span></div>
+                    <div class="mt-row"><span></span><span>Tokens refactor — color drift</span><span class="mt-v">follow-up</span></div>
+                    <div class="mt-row"><span></span><span>Migration plan — stalled at schema</span><span class="mt-v">paused</span></div>
+                  </div>
+                </div>
+                <div class="drill-card">
+                  <h4>Tool errors</h4>
+                  <div class="mt-rows">
+                    <div class="mt-row"><span></span><span>Bash · pnpm not found</span><span class="mt-v">9</span></div>
+                    <div class="mt-row"><span></span><span>Edit · file mismatch</span><span class="mt-v">2</span></div>
+                    <div class="mt-row"><span></span><span>Write · overwrite guard</span><span class="mt-v">1</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Interruptions -->
+            <div>
+              <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Interruptions</div>
+              <div class="dist-row"><div class="dist-k">User cancels</div><div class="dist-bar"><div class="dist-fill warn" style="width: 24%;"></div></div><div class="dist-v">9</div></div>
+              <div class="dist-row"><div class="dist-k">Model timeouts</div><div class="dist-bar"><div class="dist-fill" style="width: 8%;"></div></div><div class="dist-v">3</div></div>
+              <div class="dist-row"><div class="dist-k">Context resets</div><div class="dist-bar"><div class="dist-fill" style="width: 12%;"></div></div><div class="dist-v">4</div></div>
+            </div>
+          </div><!-- /dash-pane insights -->
+            </div><!-- /fp-main -->
+          </div><!-- /fp-body -->
+        </div><!-- /dash-frame -->
+      </div><!-- /pane-dashboard -->
+
+    </div><!-- /showcase-panes -->
   </div>
 </section>
 
@@ -2373,491 +2644,6 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   </div>
 </section>
 
-<!-- ─── DASHBOARD ─── -->
-<section id="dashboard" class="dash-section">
-  <div class="wrap">
-    <div class="reveal">
-      <div class="eyebrow">Full dashboard</div>
-      <h2 class="section-title">When you want the <em>whole</em> picture.</h2>
-      <p class="section-sub">
-        Open <span class="mono" style="font-size:15px;">⌘⇧P → TokSight: Open Dashboard</span>. Everything the sidebar
-        hints at, expanded — with a time-range filter across the top.
-      </p>
-    </div>
-
-    <div class="dash-frame reveal">
-      <!-- Chrome bar (fake browser/VS Code tab) -->
-      <div class="dash-topbar">
-        <div class="tl"><span></span><span></span><span></span></div>
-        <div class="editor-title mono">TokSight — Dashboard</div>
-      </div>
-
-      <!-- Real dashboard header: serif title LEFT + time-range dropdown RIGHT -->
-      <div class="fp-header" id="dashHeader">
-        <h3 class="fp-title" id="dashTitle">TokSight · Quota</h3>
-        <div class="fp-range">
-          <span id="dashRangeLbl">Last 7 days</span>
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 4 l3 3 l3-3" stroke="currentColor" stroke-width="1.4"/></svg>
-        </div>
-      </div>
-
-      <!-- Body: left nav (200px) + main content -->
-      <div class="fp-body">
-        <nav class="fp-nav" id="dashTabs">
-          <button class="fp-nav-item active" data-d="quota">Quota</button>
-          <button class="fp-nav-item" data-d="sessions">Sessions</button>
-          <button class="fp-nav-item" data-d="projects">Projects</button>
-          <button class="fp-nav-item" data-d="models-tools">Models &amp; Tools</button>
-          <button class="fp-nav-item" data-d="insights">Insights</button>
-        </nav>
-        <div class="fp-main" id="dashMain">
-      <div class="dash-pane active" data-p="quota">
-        <!-- Section 1: Hero KPI + 3 secondary stats (mirrors extension .fp-stats 2fr 1fr 1fr 1fr) -->
-        <div class="fp-stats">
-          <div class="fp-stat hero">
-            <div class="fp-stat-k">Week · all models</div>
-            <div class="fp-stat-v warn">71%</div>
-            <div class="fp-hero-bar"><div class="warn" style="width: 71%;"></div></div>
-            <div class="fp-stat-n">resets in 3d 14h</div>
-          </div>
-          <div class="fp-stat">
-            <div class="fp-stat-k">Today spend</div>
-            <div class="fp-stat-v">$14.80</div>
-            <div class="fp-stat-n">+23% vs yesterday</div>
-          </div>
-          <div class="fp-stat">
-            <div class="fp-stat-k">Cache saved · 7d</div>
-            <div class="fp-stat-v success">$6.18</div>
-            <div class="fp-stat-n">71% hit rate</div>
-          </div>
-          <div class="fp-stat">
-            <div class="fp-stat-k">Total spend · 7d</div>
-            <div class="fp-stat-v">$86.40</div>
-            <div class="fp-stat-n">&nbsp;</div>
-          </div>
-        </div>
-
-        <!-- Section 2: Current quota — two-col 3:2 (bars left, forecast card right) -->
-        <div class="fp-subhead">Current quota</div>
-        <div class="fp-two-col">
-          <div>
-            <div class="fp-row"><span class="fp-row-label">5h window</span><span class="fp-row-value accent">42%</span></div>
-            <div class="fp-bar"><div class="fp-bar-fill" style="width: 42%;"></div></div>
-            <div class="fp-quota-note">resets in 2h 18m</div>
-            <div class="fp-divider"></div>
-            <div class="fp-row"><span class="fp-row-label">Weekly · all models</span><span class="fp-row-value">71%</span></div>
-            <div class="fp-bar"><div class="fp-bar-fill warn" style="width: 71%;"></div></div>
-            <div class="fp-quota-note">resets in 3d 14h</div>
-            <div class="fp-row" style="margin-top: 10px;"><span class="fp-row-label">Weekly · Sonnet only</span><span class="fp-row-value">68%</span></div>
-            <div class="fp-bar"><div class="fp-bar-fill" style="width: 68%;"></div></div>
-          </div>
-          <div>
-            <div class="cache-card">
-              <h4>Forecast &amp; burn</h4>
-              <div class="cc-row"><span class="cc-k">Hit 5h cap in</span><span class="cc-v">~2h 15m</span></div>
-              <div class="cc-row"><span class="cc-k">Current burn</span><span class="cc-v">$0.040/min</span></div>
-              <div class="cc-row"><span class="cc-k">Peak today</span><span class="cc-v">$1.090/min · 27m ago</span></div>
-              <div class="cc-row"><span class="cc-k">ETA weekly cap</span><span class="cc-v">resets in 3d 14h</span></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Section 3: 7-day spend chart (max label + avg line, no floating labels) -->
-        <div class="fp-subhead">7-day spend</div>
-        <div class="spend7-wrap">
-          <span class="spend7-max">max $18.20</span>
-          <div class="spend7-big">
-            <div class="spend7-avg" style="bottom: 47%;" title="avg $8.60"></div>
-            <div class="b" style="height: 52%;" title="Mon · $9.40"></div>
-            <div class="b" style="height: 34%;" title="Tue · $6.12"></div>
-            <div class="b" style="height: 68%;" title="Wed · $12.40"></div>
-            <div class="b" style="height: 42%;" title="Thu · $7.60"></div>
-            <div class="b" style="height: 78%;" title="Fri · $14.20"></div>
-            <div class="b" style="height: 100%;" title="Sat · $18.20"></div>
-            <div class="b today" style="height: 82%;" title="Today · $14.80"></div>
-          </div>
-          <div class="spend7-big-labels">
-            <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Today</span>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="dash-pane" data-p="sessions">
-        <!-- fp-stats -->
-        <div class="fp-stats" style="margin-bottom: 20px;">
-          <div class="fp-stat">
-            <div class="fp-stat-k">Sessions · 7d</div>
-            <div class="fp-stat-v">37</div>
-            <div class="fp-stat-n">7d window</div>
-          </div>
-          <div class="fp-stat">
-            <div class="fp-stat-k">Avg duration</div>
-            <div class="fp-stat-v">42m</div>
-            <div class="fp-stat-n">7d window</div>
-          </div>
-          <div class="fp-stat">
-            <div class="fp-stat-k">Longest</div>
-            <div class="fp-stat-v">1h 12m</div>
-            <div class="fp-stat-n">Sonnet · today</div>
-          </div>
-          <div class="fp-stat">
-            <div class="fp-stat-k">Median / session</div>
-            <div class="fp-stat-v">$2.33</div>
-            <div class="fp-stat-n">p50 · 7d</div>
-          </div>
-        </div>
-
-        <!-- Today timeline -->
-        <div style="margin-bottom: 24px;">
-          <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Today timeline · 24h</div>
-          <div class="fp-timeline">
-            <div class="fp-t-cell" style="height: 0;"></div>
-            <div class="fp-t-cell" style="height: 0;"></div>
-            <div class="fp-t-cell" style="height: 0;"></div>
-            <div class="fp-t-cell" style="height: 0;"></div>
-            <div class="fp-t-cell" style="height: 0;"></div>
-            <div class="fp-t-cell" style="height: 0;"></div>
-            <div class="fp-t-cell" style="height: 0;"></div>
-            <div class="fp-t-cell" style="height: 18%;" title="07:00 $0.42"></div>
-            <div class="fp-t-cell" style="height: 34%;" title="08:00 $0.78"></div>
-            <div class="fp-t-cell" style="height: 62%;" title="09:00 $1.42"></div>
-            <div class="fp-t-cell" style="height: 88%;" title="10:00 $2.01"></div>
-            <div class="fp-t-cell" style="height: 74%;" title="11:00 $1.70"></div>
-            <div class="fp-t-cell" style="height: 24%;" title="12:00 $0.55"></div>
-            <div class="fp-t-cell" style="height: 58%;" title="13:00 $1.33"></div>
-            <div class="fp-t-cell active" style="height: 92%;" title="14:00 $2.10"></div>
-            <div class="fp-t-cell" style="height: 0;"></div>
-            <div class="fp-t-cell" style="height: 0;"></div>
-            <div class="fp-t-cell" style="height: 0;"></div>
-            <div class="fp-t-cell" style="height: 0;"></div>
-            <div class="fp-t-cell" style="height: 0;"></div>
-            <div class="fp-t-cell" style="height: 0;"></div>
-            <div class="fp-t-cell" style="height: 0;"></div>
-            <div class="fp-t-cell" style="height: 0;"></div>
-            <div class="fp-t-cell" style="height: 0;"></div>
-          </div>
-          <div class="fp-timeline-labels">
-            <span>00</span><span>06</span><span>12</span><span>now · 14</span><span>18</span><span>24</span>
-          </div>
-        </div>
-
-        <!-- Active session card -->
-        <div style="margin-bottom: 24px;">
-          <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Active session</div>
-          <div class="active-card">
-            <div><div class="ac-k">Project</div><div class="ac-v">acme-api</div></div>
-            <div><div class="ac-k">Model</div><div class="ac-v">claude-sonnet-4-6</div></div>
-            <div><div class="ac-k">Duration</div><div class="ac-v">48m</div></div>
-            <div><div class="ac-k">Tools</div><div class="ac-v">142 calls</div></div>
-            <div><div class="ac-k">Tokens</div><div class="ac-v">214,820 (+480/-120 lines)</div></div>
-            <div><div class="ac-k">Cost · burn</div><div class="ac-v">$6.41 · $0.133/min</div></div>
-            <div><div class="ac-k">Started</div><div class="ac-v">13:14</div></div>
-            <div><div class="ac-k">Session id</div><div class="ac-v">a8f4…c2e1</div></div>
-          </div>
-        </div>
-
-        <!-- Sessions table -->
-        <div style="margin-bottom: 24px;">
-          <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Sessions · 7d</div>
-          <div class="fp-filters">
-            <select><option>All projects</option><option>acme-api</option><option>ui-kit</option><option>obs-pipeline</option></select>
-            <select><option>All models</option><option>sonnet</option><option>opus</option><option>haiku</option></select>
-          </div>
-          <table class="fp">
-            <thead>
-              <tr>
-                <th>When</th><th>Project</th><th>Model</th>
-                <th class="num">Dur</th><th class="num">Tokens</th><th class="num">Cost</th><th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>2m ago</td><td>acme-api</td><td>sonnet</td><td class="num">48m</td><td class="num">215k</td><td class="num">$6.41</td><td>active</td></tr>
-              <tr><td>1h ago</td><td>acme-api</td><td>sonnet</td><td class="num">32m</td><td class="num">108k</td><td class="num">$3.22</td><td>—</td></tr>
-              <tr><td>3h ago</td><td>ui-kit</td><td>opus</td><td class="num">1h 12m</td><td class="num">402k</td><td class="num">$14.80</td><td>—</td></tr>
-              <tr><td>5h ago</td><td>acme-api</td><td>sonnet</td><td class="num">22m</td><td class="num">74k</td><td class="num">$2.18</td><td>—</td></tr>
-              <tr><td>yesterday</td><td>obs-pipeline</td><td>sonnet</td><td class="num">58m</td><td class="num">186k</td><td class="num">$5.58</td><td>—</td></tr>
-              <tr><td>yesterday</td><td>ui-kit</td><td>sonnet</td><td class="num">14m</td><td class="num">42k</td><td class="num">$1.20</td><td>—</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Latest recap -->
-        <div>
-          <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Latest recap</div>
-          <div class="recap-hero">
-            <div class="rh-title">Refactored auth middleware to use shared JWT helper</div>
-            <div class="rh-meta">acme-api · claude-sonnet-4-6 · 48m · 3 commits · shipped · helpfulness very high</div>
-            <div class="rh-body">Refactored auth middleware to use shared JWT helper. Broke the monolithic verifier into sign / verify / rotate primitives and wired the Stripe webhook through the new guard. Added 9 tests covering expiry edge cases.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="dash-pane" data-p="projects">
-        <!-- fp-stats -->
-        <div class="fp-stats" style="margin-bottom: 20px;">
-          <div class="fp-stat">
-            <div class="fp-stat-k">Active projects</div>
-            <div class="fp-stat-v">6</div>
-            <div class="fp-stat-n">7d window</div>
-          </div>
-          <div class="fp-stat">
-            <div class="fp-stat-k">Top project</div>
-            <div class="fp-stat-v" style="font-size: 28px;">acme-api</div>
-            <div class="fp-stat-n">44% share</div>
-          </div>
-          <div class="fp-stat">
-            <div class="fp-stat-k">Last active</div>
-            <div class="fp-stat-v" style="font-size: 28px;">acme-api</div>
-            <div class="fp-stat-n">2m ago</div>
-          </div>
-          <div class="fp-stat">
-            <div class="fp-stat-k">Projects · new</div>
-            <div class="fp-stat-v">2</div>
-            <div class="fp-stat-n">first-seen 7d</div>
-          </div>
-        </div>
-
-        <!-- Today split -->
-        <div style="margin-bottom: 24px;">
-          <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Today · project split</div>
-          <div class="proj-split">
-            <i style="width: 52%; background: var(--accent);"></i>
-            <i style="width: 26%; background: var(--model-opus);"></i>
-            <i style="width: 14%; background: var(--model-sonnet);"></i>
-            <i style="width: 8%; background: var(--model-haiku);"></i>
-          </div>
-          <div class="mt-rows">
-            <div class="mt-row"><span class="dot" style="background: var(--accent);"></span><span>acme-api · 3 sessions</span><span class="mt-v">$4.12 · 52%</span></div>
-            <div class="mt-row"><span class="dot" style="background: var(--model-opus);"></span><span>ui-kit · 2 sessions</span><span class="mt-v">$2.08 · 26%</span></div>
-            <div class="mt-row"><span class="dot" style="background: var(--model-sonnet);"></span><span>obs-pipeline · 1 session</span><span class="mt-v">$1.12 · 14%</span></div>
-            <div class="mt-row"><span class="dot" style="background: var(--model-haiku);"></span><span>docs-site · 1 session</span><span class="mt-v">$0.63 · 8%</span></div>
-          </div>
-        </div>
-
-        <!-- Project ranking -->
-        <div style="margin-bottom: 24px;">
-          <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Project ranking · 7d</div>
-          <table class="fp">
-            <thead>
-              <tr>
-                <th>Project</th>
-                <th class="num">Sessions</th>
-                <th class="num">Tokens</th>
-                <th class="num">Cost</th>
-                <th>Share</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>acme-api</td><td class="num">14</td><td class="num">1.8M</td><td class="num">$38.14</td><td><div class="share-bar"><i style="width: 44%;"></i></div></td></tr>
-              <tr><td>ui-kit</td><td class="num">8</td><td class="num">1.1M</td><td class="num">$24.60</td><td><div class="share-bar"><i style="width: 28%;"></i></div></td></tr>
-              <tr><td>obs-pipeline</td><td class="num">6</td><td class="num">580k</td><td class="num">$12.90</td><td><div class="share-bar"><i style="width: 15%;"></i></div></td></tr>
-              <tr><td>docs-site</td><td class="num">3</td><td class="num">220k</td><td class="num">$6.42</td><td><div class="share-bar"><i style="width: 7%;"></i></div></td></tr>
-              <tr><td>infra-terraform</td><td class="num">2</td><td class="num">120k</td><td class="num">$3.18</td><td><div class="share-bar"><i style="width: 4%;"></i></div></td></tr>
-              <tr><td>home-dotfiles</td><td class="num">4</td><td class="num">42k</td><td class="num">$1.16</td><td><div class="share-bar"><i style="width: 2%;"></i></div></td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Top project drill -->
-        <div>
-          <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Top project · acme-api</div>
-          <div class="two-col">
-            <div class="drill-card">
-              <h4>Model mix</h4>
-              <div class="model-stack">
-                <i style="width: 72%; background: var(--model-sonnet);"></i>
-                <i style="width: 22%; background: var(--model-opus);"></i>
-                <i style="width: 6%; background: var(--model-haiku);"></i>
-              </div>
-              <div class="mt-rows">
-                <div class="mt-row"><span class="model-chip sonnet"></span><span>Sonnet</span><span class="mt-v">1.3M · $27.48</span></div>
-                <div class="mt-row"><span class="model-chip opus"></span><span>Opus</span><span class="mt-v">400k · $10.12</span></div>
-                <div class="mt-row"><span class="model-chip haiku"></span><span>Haiku</span><span class="mt-v">100k · $0.54</span></div>
-              </div>
-            </div>
-            <div class="drill-card">
-              <h4>Recent sessions</h4>
-              <div class="mt-rows">
-                <div class="mt-row"><span></span><span>Refactor auth middleware</span><span class="mt-v">$6.41</span></div>
-                <div class="mt-row"><span></span><span>Debug Stripe webhook</span><span class="mt-v">$3.22</span></div>
-                <div class="mt-row"><span></span><span>Write migration plan</span><span class="mt-v">$2.18</span></div>
-                <div class="mt-row"><span></span><span>Add feature flag loader</span><span class="mt-v">$1.40</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="dash-pane" data-p="models">
-        <!-- Model mix -->
-        <div style="margin-bottom: 24px;">
-          <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Model mix · 7d</div>
-          <div class="model-stack">
-            <i style="width: 76%; background: var(--model-sonnet);"></i>
-            <i style="width: 18%; background: var(--model-opus);"></i>
-            <i style="width: 6%; background: var(--model-haiku);"></i>
-          </div>
-          <div class="mt-rows">
-            <div class="mt-row"><span class="model-chip sonnet"></span><span>claude-sonnet-4-6</span><span class="mt-v">3.4M · $62.80</span></div>
-            <div class="mt-row"><span class="model-chip opus"></span><span>claude-opus-4-6</span><span class="mt-v">420k · $18.94</span></div>
-            <div class="mt-row"><span class="model-chip haiku"></span><span>claude-haiku-4-5</span><span class="mt-v">198k · $0.82</span></div>
-          </div>
-        </div>
-
-        <!-- Token breakdown -->
-        <div style="margin-bottom: 24px;">
-          <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Token breakdown · 7d</div>
-          <div class="token-cells">
-            <div class="tc"><div class="tc-k">Input</div><div class="tc-v">642k</div></div>
-            <div class="tc"><div class="tc-k">Output</div><div class="tc-v">568k</div></div>
-            <div class="tc"><div class="tc-k">Cache read</div><div class="tc-v">2.4M</div></div>
-            <div class="tc"><div class="tc-k">Cache create</div><div class="tc-v">380k</div></div>
-          </div>
-          <div style="margin-top: 14px;">
-            <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; margin-bottom: 6px;">
-              <span>Output ratio</span><span>14.2%</span>
-            </div>
-            <div class="fp-bar"><div class="fp-bar-fill" style="width: 14.2%;"></div></div>
-          </div>
-        </div>
-
-        <!-- Tools table -->
-        <div style="margin-bottom: 24px;">
-          <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Tools · 7d</div>
-          <table class="fp">
-            <thead>
-              <tr>
-                <th>Tool</th>
-                <th class="num">Calls</th>
-                <th class="num">Tokens</th>
-                <th class="num">Cost</th>
-                <th class="num">Errors</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>Read</td><td class="num">2,104</td><td class="num">640k</td><td class="num">$12.40</td><td class="num">0</td></tr>
-              <tr><td>Edit</td><td class="num">1,412</td><td class="num">420k</td><td class="num">$9.82</td><td class="num">2</td></tr>
-              <tr><td>Bash</td><td class="num">892</td><td class="num">280k</td><td class="num">$6.18</td><td class="num">11</td></tr>
-              <tr><td>Grep</td><td class="num">412</td><td class="num">88k</td><td class="num">$2.04</td><td class="num">0</td></tr>
-              <tr><td>Glob</td><td class="num">248</td><td class="num">42k</td><td class="num">$0.96</td><td class="num">0</td></tr>
-              <tr><td>Write</td><td class="num">180</td><td class="num">112k</td><td class="num">$2.60</td><td class="num">1</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- MCP · Skills -->
-        <div style="margin-bottom: 24px;">
-          <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">MCP · Skills</div>
-          <div class="two-col">
-            <div class="drill-card">
-              <h4>MCP servers</h4>
-              <div class="mt-rows">
-                <div class="mt-row"><span></span><span>gitnexus · query</span><span class="mt-v">84 calls</span></div>
-                <div class="mt-row"><span></span><span>gitnexus · impact</span><span class="mt-v">36 calls</span></div>
-                <div class="mt-row"><span></span><span>vanna · run_sql</span><span class="mt-v">18 calls</span></div>
-              </div>
-            </div>
-            <div class="drill-card">
-              <h4>Skills used</h4>
-              <div class="mt-rows">
-                <div class="mt-row"><span></span><span>writing-plans</span><span class="mt-v">12</span></div>
-                <div class="mt-row"><span></span><span>brainstorming</span><span class="mt-v">8</span></div>
-                <div class="mt-row"><span></span><span>executing-plans</span><span class="mt-v">5</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Cache performance -->
-        <div>
-          <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Cache performance</div>
-          <div class="cache-card">
-            <div><div class="cc-k">Hit rate</div><div class="cc-v">71%</div><div class="cc-n">7d average</div></div>
-            <div><div class="cc-k">Cache saved</div><div class="cc-v" style="color: var(--good);">−$6.18</div><div class="cc-n">vs. fresh reads</div></div>
-            <div><div class="cc-k">Cache writes</div><div class="cc-v">380k</div><div class="cc-n">create tokens</div></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="dash-pane" data-p="insights">
-        <!-- Recent recaps -->
-        <div style="margin-bottom: 24px;">
-          <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Recent recaps</div>
-          <div class="recap-hero">
-            <div class="rh-title">Refactored auth middleware to use shared JWT helper</div>
-            <div class="rh-meta">acme-api · sonnet · 48m · 3 commits · shipped · helpfulness very high</div>
-            <div class="rh-body">Broke the monolithic verifier into sign / verify / rotate primitives. Wired Stripe webhook through the new guard. Added 9 tests covering expiry edge cases.</div>
-          </div>
-          <div class="recap-hero">
-            <div class="rh-title">Design system audit — tokens consolidated into one file</div>
-            <div class="rh-meta">ui-kit · opus · 1h 12m · 2 commits · shipped · helpfulness high</div>
-            <div class="rh-body">Mapped 14 ad-hoc color variables back to Claude palette tokens. Deleted 3 duplicate border-radius scales. One regression caught by visual-snapshot suite and reverted.</div>
-          </div>
-        </div>
-
-        <!-- Live insights -->
-        <div style="margin-bottom: 24px;">
-          <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Live insights</div>
-          <div class="dist-row"><div class="dist-k">5h window spend</div><div class="dist-bar"><div class="dist-fill warn" style="width: 68%;"></div></div><div class="dist-v">$3.42 / $5</div></div>
-          <div class="dist-row"><div class="dist-k">Peak burn today</div><div class="dist-bar"><div class="dist-fill" style="width: 44%;"></div></div><div class="dist-v">$0.19/min</div></div>
-          <div class="dist-row"><div class="dist-k">Context pressure</div><div class="dist-bar"><div class="dist-fill danger" style="width: 94%;"></div></div><div class="dist-v">94% · 3 sess</div></div>
-        </div>
-
-        <!-- Outcome distribution -->
-        <div style="margin-bottom: 24px;">
-          <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Outcome distribution · 7d</div>
-          <div class="dist-row"><div class="dist-k">Shipped</div><div class="dist-bar"><div class="dist-fill success" style="width: 74%;"></div></div><div class="dist-v">27</div></div>
-          <div class="dist-row"><div class="dist-k">Paused</div><div class="dist-bar"><div class="dist-fill warn" style="width: 19%;"></div></div><div class="dist-v">7</div></div>
-          <div class="dist-row"><div class="dist-k">Abandoned</div><div class="dist-bar"><div class="dist-fill danger" style="width: 7%;"></div></div><div class="dist-v">3</div></div>
-        </div>
-
-        <!-- Helpfulness -->
-        <div style="margin-bottom: 24px;">
-          <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Claude helpfulness · 7d</div>
-          <div class="dist-row"><div class="dist-k">★★★★★ Very high</div><div class="dist-bar"><div class="dist-fill" style="width: 48%;"></div></div><div class="dist-v">18</div></div>
-          <div class="dist-row"><div class="dist-k">★★★★ High</div><div class="dist-bar"><div class="dist-fill" style="width: 30%;"></div></div><div class="dist-v">11</div></div>
-          <div class="dist-row"><div class="dist-k">★★★ Mixed</div><div class="dist-bar"><div class="dist-fill warn" style="width: 16%;"></div></div><div class="dist-v">6</div></div>
-          <div class="dist-row"><div class="dist-k">★★ / ★ Low</div><div class="dist-bar"><div class="dist-fill danger" style="width: 6%;"></div></div><div class="dist-v">2</div></div>
-        </div>
-
-        <!-- Friction / Tool errors -->
-        <div style="margin-bottom: 24px;">
-          <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Friction · 7d</div>
-          <div class="two-col">
-            <div class="drill-card">
-              <h4>Friction history</h4>
-              <div class="mt-rows">
-                <div class="mt-row"><span></span><span>Stripe webhook — env parsing</span><span class="mt-v">reverted</span></div>
-                <div class="mt-row"><span></span><span>Tokens refactor — color drift</span><span class="mt-v">follow-up</span></div>
-                <div class="mt-row"><span></span><span>Migration plan — stalled at schema</span><span class="mt-v">paused</span></div>
-              </div>
-            </div>
-            <div class="drill-card">
-              <h4>Tool errors</h4>
-              <div class="mt-rows">
-                <div class="mt-row"><span></span><span>Bash · pnpm not found</span><span class="mt-v">9</span></div>
-                <div class="mt-row"><span></span><span>Edit · file mismatch</span><span class="mt-v">2</span></div>
-                <div class="mt-row"><span></span><span>Write · overwrite guard</span><span class="mt-v">1</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Interruptions -->
-        <div>
-          <div class="fp-subhead" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 10px;">Interruptions</div>
-          <div class="dist-row"><div class="dist-k">User cancels</div><div class="dist-bar"><div class="dist-fill warn" style="width: 24%;"></div></div><div class="dist-v">9</div></div>
-          <div class="dist-row"><div class="dist-k">Model timeouts</div><div class="dist-bar"><div class="dist-fill" style="width: 8%;"></div></div><div class="dist-v">3</div></div>
-          <div class="dist-row"><div class="dist-k">Context resets</div><div class="dist-bar"><div class="dist-fill" style="width: 12%;"></div></div><div class="dist-v">4</div></div>
-        </div>
-      </div><!-- /dash-pane insights -->
-        </div><!-- /fp-main -->
-      </div><!-- /fp-body -->
-    </div><!-- /dash-frame -->
-  </div>
-</section>
-
 <!-- ─── PRIVACY ─── -->
 <section style="padding-top: 20px;">
   <div class="wrap">
@@ -2927,12 +2713,12 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
         Search <span class="mono">TokSight</span> in the VS Code Marketplace (more IDEs coming soon), or drop the <span class="mono">.vsix</span>. That's it.
       </p>
       <div class="cta-row">
-        <a class="btn-primary" href="https://marketplace.visualstudio.com/items?itemName=toksight.toksight">
+        <a class="btn-primary" href="https://marketplace.visualstudio.com/items?itemName=ghuypham.toksight">
           Install from Marketplace
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
         </a>
-        <a class="btn-secondary" href="https://github.com/toksight/toksight/releases/latest">Download .vsix</a>
-        <a class="btn-secondary" href="https://github.com/toksight/toksight" style="display:inline-flex;align-items:center;gap:6px;">
+        <a class="btn-secondary" href="https://github.com/ghuypham/toksight/releases/latest">Download .vsix</a>
+        <a class="btn-secondary" href="https://github.com/ghuypham/toksight" style="display:inline-flex;align-items:center;gap:6px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2.01c-3.2.69-3.88-1.54-3.88-1.54-.52-1.33-1.28-1.68-1.28-1.68-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.74.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.19-3.09-.12-.29-.52-1.47.11-3.06 0 0 .97-.31 3.18 1.18.92-.26 1.91-.39 2.89-.39s1.97.13 2.89.39c2.21-1.49 3.18-1.18 3.18-1.18.63 1.59.23 2.77.11 3.06.74.81 1.19 1.84 1.19 3.09 0 4.41-2.69 5.39-5.25 5.67.41.36.77 1.06.77 2.14v3.17c0 .31.21.67.8.56C20.21 21.39 23.5 17.08 23.5 12c0-6.35-5.15-11.5-11.5-11.5Z"/></svg>
           Star on GitHub
         </a>
@@ -2980,10 +2766,10 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
       <span>© 2026 · MIT License</span>
     </div>
     <div style="display:flex; gap: 24px;">
-      <a href="https://github.com/toksight/toksight" style="color: var(--ink-2); text-decoration: none;">GitHub</a>
-      <a href="https://marketplace.visualstudio.com/items?itemName=toksight.toksight" style="color: var(--ink-2); text-decoration: none;">Marketplace</a>
-      <a href="https://github.com/toksight/toksight/issues" style="color: var(--ink-2); text-decoration: none;">Issues</a>
-      <a href="https://github.com/toksight/toksight/releases" style="color: var(--ink-2); text-decoration: none;">Changelog</a>
+      <a href="https://github.com/ghuypham/toksight" style="color: var(--ink-2); text-decoration: none;">GitHub</a>
+      <a href="https://marketplace.visualstudio.com/items?itemName=ghuypham.toksight" style="color: var(--ink-2); text-decoration: none;">Marketplace</a>
+      <a href="https://github.com/ghuypham/toksight/issues" style="color: var(--ink-2); text-decoration: none;">Issues</a>
+      <a href="https://github.com/ghuypham/toksight/releases" style="color: var(--ink-2); text-decoration: none;">Changelog</a>
     </div>
   </div>
   <div class="wrap" style="margin-top: 20px; font-size: 12px; color: var(--ink-4); max-width: 760px;">
@@ -3013,7 +2799,7 @@ document.getElementById('themeBtn').addEventListener('click', () => {
 
 /* ───────────────────────── hero widget carousel ─────────────── */
 // 3 real slides of TokSight's Explorer widget: Quota → Session Now → Last Recap
-const wSlides = document.querySelectorAll('#heroWidget .wslide');
+const wSlides = document.querySelectorAll('#showcaseWidget .wslide');
 let widgetIdx = 0;
 
 function renderSpark(el, seed) {
@@ -3036,7 +2822,7 @@ function rotateWidget() {
 }
 
 // initial render
-renderSpark(document.querySelector('[data-spark="0"]'), 1);
+renderSpark(document.querySelector('[data-spark="1"]'), 1);
 setInterval(() => {
   widgetIdx = (widgetIdx + 1) % wSlides.length;
   rotateWidget();
@@ -3084,6 +2870,17 @@ if (copyBtnEl) {
     }
   });
 }
+
+/* ───────────────────────── product showcase tabs ─────────────── */
+document.querySelectorAll('.showcase-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.showcase-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.showcase-pane').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+    tab.classList.add('active');
+    const pane = document.getElementById('pane-' + tab.dataset.showcase);
+    if (pane) { pane.classList.add('active'); pane.style.display = 'block'; }
+  });
+});
 
 /* ───────────────────────── dashboard tabs ───────────────────── */
 const DASH_TITLES = {

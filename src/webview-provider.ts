@@ -81,6 +81,17 @@ export class TokSightViewProvider implements vscode.WebviewViewProvider {
     this.view?.webview.postMessage({ type: 'sessionDetail', data: detail });
   }
 
+  /** Set activity bar badge (e.g. 5h quota %). Gracefully ignored on older VS Code. */
+  setBadge(value: number, tooltip: string): void {
+    try {
+      if (this.view && 'badge' in this.view) {
+        (this.view as any).badge = value > 0
+          ? { value, tooltip }
+          : undefined;
+      }
+    } catch { /* badge API unavailable — ignore */ }
+  }
+
   private getHtml(webview: vscode.Webview): string {
     const scriptUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview.js'),

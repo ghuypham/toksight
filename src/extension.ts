@@ -421,6 +421,9 @@ export function activate(context: vscode.ExtensionContext): void {
     statusBar?.update({ metrics, usageLimits, burnPerMin: burnRate.nowPerMin });
     explorerProvider.updateFull(explorerData);
     viewProvider.postMessage(webviewData);
+    // Activity bar badge: show 5h quota % (safe ignore if API unavailable)
+    const badgePct = usageLimits?.fiveHour?.utilization ?? 0;
+    viewProvider.setBadge(badgePct, `5h quota: ${badgePct}%`);
     dashboardProvider.update(webviewData);
     viewProvider.postSettings({
       carouselInterval: config.get<number>('carouselInterval', 5000),

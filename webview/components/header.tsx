@@ -1,5 +1,6 @@
 import { theme } from '../styles/theme';
 import { sendToExtension } from '../hooks/use-extension-data';
+import { quotaSeverityColor } from '../utils/quota-severity';
 import type { WebviewData } from '../../src/types';
 
 interface HeaderProps {
@@ -84,11 +85,56 @@ function BloomIcon({ size = 28 }: { size?: number }) {
   );
 }
 
+/** BloomIcon wrapped with a circular 5h-quota progress ring.
+ *  Ring hidden when quota data unavailable (no OAuth). */
+function BloomWithRing({ size = 28, quotaPct }: { size?: number; quotaPct: number | null }) {
+  const ringSize = size + 8; // 36px total (28px icon + 4px ring on each side)
+  const center = ringSize / 2;
+  const radius = (ringSize - 4) / 2; // 2px stroke → inset 2px
+  const circumference = 2 * Math.PI * radius;
+  const offset = quotaPct != null ? circumference * (1 - quotaPct / 100) : circumference;
+  const color = quotaPct != null ? quotaSeverityColor(quotaPct) : 'transparent';
+
+  return (
+    <div style={{ position: 'relative', width: ringSize, height: ringSize, flexShrink: 0 }}>
+      {/* Ring SVG behind icon */}
+      {quotaPct != null && (
+        <svg
+          width={ringSize}
+          height={ringSize}
+          style={{ position: 'absolute', top: 0, left: 0, transform: 'rotate(-90deg)' }}
+        >
+          {/* Track */}
+          <circle cx={center} cy={center} r={radius}
+            fill="none" stroke="var(--tok-bar-empty, rgba(128,128,128,0.15))" strokeWidth="2.5" />
+          {/* Fill */}
+          <circle cx={center} cy={center} r={radius}
+            fill="none" stroke={color} strokeWidth="2.5"
+            strokeDasharray={circumference} strokeDashoffset={offset}
+            strokeLinecap="round"
+            style={{ transition: 'stroke-dashoffset 0.6s ease, stroke 0.3s ease' }} />
+        </svg>
+      )}
+      {/* Bloom icon centered */}
+      <div style={{
+        position: 'absolute',
+        top: (ringSize - size) / 2,
+        left: (ringSize - size) / 2,
+      }}>
+        <BloomIcon size={size} />
+      </div>
+    </div>
+  );
+}
+
 /**
  * Sidebar header — animated bloom icon left, username centre, LIVE/OFFLINE + expand right.
  */
 export function Header({ data }: HeaderProps) {
-  const { username, isLive } = data;
+  const { username, isLive, usageLimits, usageLimitsStatus } = data;
+  const quotaPct = usageLimitsStatus === 'ok' && usageLimits?.fiveHour
+    ? usageLimits.fiveHour.utilization
+    : null;
 
   return (
     <div style={{
@@ -99,8 +145,8 @@ export function Header({ data }: HeaderProps) {
       alignItems: 'center',
       gap: '8px',
     }}>
-      {/* animated bloom */}
-      <BloomIcon size={28} />
+      {/* bloom icon with 5h quota ring */}
+      <BloomWithRing size={28} quotaPct={quotaPct} />
 
       {/* username */}
       <span style={{
