@@ -30,6 +30,8 @@ export function aggregateData(
     tokens: number; cost: number; model: string; lastTime: string; firstTime: string;
     toolCallCount: number;
   }>();
+  /** Collect timestamps per session for active-duration calculation */
+  const sessionTimestamps = new Map<string, number[]>();
 
   for (const msg of messages) {
     if (msg.type !== 'assistant' || !msg.usage) continue;
@@ -46,6 +48,14 @@ export function aggregateData(
     if (msg.timestamp) {
       const day = msg.timestamp.slice(0, 10);
       dailyCosts.set(day, (dailyCosts.get(day) ?? 0) + cost);
+    }
+
+    // Collect timestamps for active-duration calc
+    if (msg.timestamp) {
+      const ts = new Date(msg.timestamp).getTime();
+      const arr = sessionTimestamps.get(msg.sessionId);
+      if (arr) arr.push(ts);
+      else sessionTimestamps.set(msg.sessionId, [ts]);
     }
 
     // Session stats
@@ -144,7 +154,17 @@ export function aggregateData(
     .slice(0, 5)
     .map(([id, s]) => {
       const elapsed = (now.getTime() - new Date(s.lastTime).getTime()) / 1000;
-      const durationMin = (new Date(s.lastTime).getTime() - new Date(s.firstTime).getTime()) / 60000;
+      // Active duration: sum gaps between consecutive messages that are < 30min.
+      // Gaps ≥ 30min are idle breaks (sleep, meetings) — excluded from duration.
+      const IDLE_THRESHOLD_MS = 30 * 60_000;
+      const timestamps = sessionTimestamps.get(id) ?? [];
+      timestamps.sort((a, b) => a - b);
+      let activeMs = 0;
+      for (let i = 1; i < timestamps.length; i++) {
+        const gap = timestamps[i] - timestamps[i - 1];
+        if (gap < IDLE_THRESHOLD_MS) activeMs += gap;
+      }
+      const durationMin = activeMs / 60_000;
       const costPerMin = durationMin > 0 ? s.cost / durationMin : 0;
       return {
         id: id.slice(0, 8),

@@ -31,7 +31,7 @@ const COLOR_ENABLED: boolean = (() => {
  * Windows Terminal (WT_SESSION) and modern PowerShell support UTF-8.
  * Legacy cmd.exe uses code page 437 — block chars render as garbage.
  */
-const UNICODE_ENABLED: boolean = (() => {
+export const UNICODE_ENABLED: boolean = (() => {
   if (process.platform !== 'win32') return true;
   // Windows Terminal sets WT_SESSION; VS Code terminal sets TERM_PROGRAM
   if (process.env.WT_SESSION) return true;
@@ -181,6 +181,15 @@ export function renderHeader(version: string, isLive: boolean): string {
   return `${bold(orange('TokSight'))} ${dim(`v${version}`)}   ${live}`;
 }
 
+/** Render a section divider: ── project-name ──────── */
+export function renderSectionHeader(name: string): string {
+  const sep = UNICODE_ENABLED ? '─' : '-';
+  const left = sep.repeat(2);
+  const rightLen = Math.max(0, 40 - name.length);
+  const right = sep.repeat(rightLen);
+  return `${dim(left)} ${bold(orange(name))} ${dim(right)}`;
+}
+
 export function renderToday(s: TodayStats): string {
   const parts = [
     colorMoney(s.spend),
@@ -203,7 +212,9 @@ export function renderWeek(s: WeekStats): string {
     : s.trendPct < 0
       ? green(`${Math.round(s.trendPct)}%`)
       : dim('flat');
-  return `${label('week')}   ${colorMoney(s.spend)}  ·  ${s.sessions} sessions  ${dim('vs last week')} ${trend}`;
+  const prevSpend = s.spend / (1 + s.trendPct / 100);
+  const prevLabel = prevSpend > 0 ? dim(` (prev ${fmtMoney(prevSpend)})`) : '';
+  return `${label('week')}   ${colorMoney(s.spend)}  ·  ${s.sessions} sessions  ${dim('vs last week')} ${trend}${prevLabel}`;
 }
 
 export function renderQuota(limits: UsageLimits): string {
@@ -342,7 +353,9 @@ export function renderCacheSavings(savedUsd: number, cacheRate: number): string 
 }
 
 export function renderScore(score: number): string {
-  return `${label('score')}    ${colorScore(score)}`;
+  const rounded = Math.round(score);
+  const rating = rounded >= 70 ? 'good' : rounded >= 40 ? 'ok' : 'low';
+  return `${label('score')}    ${colorScore(score)} ${dim(`(${rating})`)}`;
 }
 
 export function renderFooter(updatedAt: Date): string {
@@ -353,12 +366,15 @@ export function renderFooter(updatedAt: Date): string {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function shortModel(model: string): string {
+/** Display model name with version: "claude-opus-4-6" → "Opus 4.6" */
+export function shortModel(model: string): string {
   if (!model) return 'unknown';
-  if (model.includes('opus'))   return 'Opus';
-  if (model.includes('sonnet')) return 'Sonnet';
-  if (model.includes('haiku'))  return 'Haiku';
-  return model.split('-').slice(-1)[0] ?? model;
+  const verMatch = model.match(/claude[-_][a-z]+[-_](\d+)[-_](\d+)/i);
+  const ver = verMatch ? ` ${verMatch[1]}.${verMatch[2]}` : '';
+  if (model.includes('opus'))   return `Opus${ver}`;
+  if (model.includes('sonnet')) return `Sonnet${ver}`;
+  if (model.includes('haiku'))  return `Haiku${ver}`;
+  return model;
 }
 
 function truncate(s: string, max: number): string {

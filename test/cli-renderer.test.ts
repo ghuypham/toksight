@@ -202,10 +202,10 @@ describe('renderModels', () => {
       { model: 'claude-opus-4-6',  percentage: 40, cost: 1 },
       { model: 'claude-sonnet-4-6', percentage: 20, cost: 0.5 },
     ]));
-    // Should show Opus once with merged 80%
-    const matches = out.match(/Opus/g) ?? [];
-    expect(matches.length).toBe(1);
-    expect(out).toContain('80%');
+    // With versioned names, Opus 4.5 and Opus 4.6 are separate entries
+    expect(out).toContain('Opus 4.5');
+    expect(out).toContain('Opus 4.6');
+    expect(out).toContain('40%');
   });
 });
 

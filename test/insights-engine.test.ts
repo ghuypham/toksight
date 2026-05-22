@@ -30,12 +30,24 @@ describe('generateInsights', () => {
     expect(found).toBeDefined();
   });
 
-  it('flags opus heavy usage', () => {
+  it('flags opus heavy usage when multiple models available', () => {
+    // Insight only fires when an alternative model exists (2+ models in mix)
     const insights = generateInsights(
-      makeMetrics({ modelMix: [{ model: 'claude-opus-4-6', percentage: 80, cost: 40 }] }), [],
+      makeMetrics({ modelMix: [
+        { model: 'claude-opus-4-6', percentage: 80, cost: 40 },
+        { model: 'claude-sonnet-4-6', percentage: 20, cost: 10 },
+      ] }), [],
     );
     const found = insights.find((i) => i.text.includes('Opus at'));
     expect(found).toBeDefined();
+  });
+
+  it('skips opus insight when only one model in use', () => {
+    const insights = generateInsights(
+      makeMetrics({ modelMix: [{ model: 'claude-opus-4-6', percentage: 100, cost: 50 }] }), [],
+    );
+    const found = insights.find((i) => i.text.includes('Opus at'));
+    expect(found).toBeUndefined();
   });
 
   it('returns max 3 insights by default', () => {

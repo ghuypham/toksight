@@ -22,7 +22,10 @@ const rules: InsightRule[] = [
   },
 
   // Opus heavy — actionable (works for any opus version: 4-6, 4-7, etc.)
+  // Skip when only one model is in use — no alternative to suggest
   (metrics) => {
+    const activeModels = metrics.modelMix.filter((m) => m.percentage > 0 && m.model !== '<synthetic>');
+    if (activeModels.length < 2) return null;
     const opus = metrics.modelMix.find((m) => isModelFamily(m.model, 'opus'));
     if (opus && opus.percentage > 70) {
       return { icon: '💰', text: `Opus at ${Math.round(opus.percentage)}% of spend`, sub: 'Consider Sonnet for routine coding — saves ~5x per token', priority: 'actionable' };
@@ -49,20 +52,30 @@ const rules: InsightRule[] = [
   },
 
   // Long session — informational
+  // Uses active message timestamps (wall-clock spans include idle gaps so we use
+  // per-message time spread as a proxy for active duration — matches aggregator logic).
   (_metrics, messages) => {
+    // Group messages by session and compute active span (first → last assistant message)
     const sessionTimes = new Map<string, { start: number; end: number }>();
     for (const msg of messages) {
-      if (!msg.timestamp) continue;
+      if (!msg.timestamp || msg.type !== 'assistant') continue;
       const time = new Date(msg.timestamp).getTime();
       const existing = sessionTimes.get(msg.sessionId);
-      if (existing) { existing.end = Math.max(existing.end, time); }
-      else { sessionTimes.set(msg.sessionId, { start: time, end: time }); }
+      if (existing) {
+        if (time < existing.start) existing.start = time;
+        if (time > existing.end) existing.end = time;
+      } else {
+        sessionTimes.set(msg.sessionId, { start: time, end: time });
+      }
     }
+    // Find the longest active session in the window
+    let maxHours = 0;
     for (const [, times] of sessionTimes) {
       const hours = (times.end - times.start) / (1000 * 60 * 60);
-      if (hours > 2) {
-        return { icon: '⏱️', text: `Long session (${Math.round(hours)}h)`, sub: 'Efficiency usually drops after 2h — consider starting fresh', priority: 'informational' };
-      }
+      if (hours > maxHours) maxHours = hours;
+    }
+    if (maxHours > 2) {
+      return { icon: '⏱️', text: `Long session (${Math.round(maxHours)}h active)`, sub: 'Efficiency usually drops after 2h — consider starting fresh', priority: 'informational' };
     }
     return null;
   },
